@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+# Project Context
+- PRD 문서: @docs/PRD.md
+- 개발 로드맵: @ROADMAP.md
+
 ## 개발 명령어
 
 ```bash
@@ -18,13 +22,13 @@ npx shadcn@latest add [component-name]   # shadcn/ui 컴포넌트 추가
 
 ## 아키텍처
 
-Next.js 16 App Router 기반의 한국어 스타터 킷입니다. 백엔드·데이터베이스·인증·API 라우트가 아직 없고, 정적 페이지 3개(`/`, `/about`, `/docs`)와 레이아웃 셸만 존재합니다.
+Next.js 16 App Router 기반의 Notion CMS PM 포트폴리오 사이트입니다(요구사항은 `docs/PRD.md`). 백엔드·데이터베이스·인증·API 라우트가 아직 없고, 정적 페이지 2개(`/`, `/about`)와 레이아웃 셸만 존재합니다. `SITE_CONFIG.navLinks`의 `/projects`는 M2에서 라우트가 생기기 전까지 404입니다.
 
 ### 콘텐츠의 단일 출처: `lib/site-config.ts`
 
-`SITE_CONFIG`(사이트 이름, 설명, GitHub URL, 네비게이션 링크)를 `app/layout.tsx`의 `metadata`, `Navbar`, `Footer`, 그리고 세 페이지가 모두 참조합니다. **사이트 이름이나 메뉴를 바꾸라는 요청은 이 파일 한 곳만 고쳐서 끝나야 합니다.** 페이지를 추가하면 `navLinks`에도 넣어야 navbar와 모바일 드롭다운에 동시에 반영됩니다.
+`SITE_CONFIG`(사이트 이름, 설명, 네비게이션 링크)를 `app/layout.tsx`의 `metadata`, `Navbar`, `Footer`, 그리고 각 페이지가 모두 참조합니다. **사이트 이름이나 메뉴를 바꾸라는 요청은 이 파일 한 곳만 고쳐서 끝나야 합니다.** 페이지를 추가하면 `navLinks`에도 넣어야 navbar와 모바일 드롭다운에 동시에 반영됩니다.
 
-예외: `Navbar` 우측의 버전 배지(`v1.0.0`)는 `SITE_CONFIG`에 없고 JSX에 하드코딩되어 있습니다.
+`Navbar`와 `Footer`에는 `SITE_CONFIG` 밖의 하드코딩 콘텐츠가 없습니다.
 
 ### 서버 컴포넌트가 기본
 
@@ -71,3 +75,13 @@ TypeScript가 아는 별칭은 `tsconfig.json`의 `@/*` → `./*` **하나뿐**�
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

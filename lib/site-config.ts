@@ -1,11 +1,10 @@
 export const SITE_CONFIG = {
-  name: "Next.js Starter Kit",
+  name: "PM 포트폴리오",
   description:
-    "Next.js v16, TypeScript, TailwindCSS v4, shadcn/ui로 구성된 스타터 킷입니다.",
-  githubUrl: "https://github.com/heymrcha/claude-code-my-product-starter-kit",
+    "프로덕트 매니저의 프로젝트 포트폴리오 — 어떤 프로젝트에서 어떤 역할로 무슨 성과를 냈는지 소개합니다.",
   navLinks: [
     { href: "/", label: "홈" },
+    { href: "/projects", label: "프로젝트" },
     { href: "/about", label: "소개" },
-    { href: "/docs", label: "문서" },
   ],
 } as const

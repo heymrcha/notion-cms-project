@@ -4,7 +4,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -61,9 +60,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Badge variant="secondary" className="mr-2">
-            v1.0.0
-          </Badge>
           <ThemeToggle />
         </div>
       </div>
