@@ -71,7 +71,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `SITE_CONFIG.navLinks`의 `/projects`가 더 이상 404가 아님을 개발 서버에서 확인
   - F5 잔여 확인: `/docs` 삭제·`v1.0.0` 배지 제거·스타터 문구 정리가 워킹 트리에 반영됐는지 재점검 후 커밋
 
-- **Task 002: Notion 타입 정의 및 페치 계층 파일 골격 작성** - 우선순위
+- ✅ **Task 002: Notion 타입 정의 및 페치 계층 파일 골격 작성** - See: /tasks/002-notion-types-and-fetch-skeleton.md
   - `lib/notion/types.ts`: PRD §7.1 `Project` 타입, `ProjectListItem`(카드에 필요한 필드 부분집합), `NotionBlock` 유니온(§6.3 7종 + `RichText` 인라인 서식: 굵게·기울임·인라인 코드·링크)
   - `lib/notion/client.ts`: 단일 인스턴스 export 시그니처(`server-only` import로 클라이언트 번들 유입 차단, 구현은 Phase 3)
   - `lib/notion/queries.ts`: `getPublishedProjects(): Promise<Project[]>`, `getProjectBySlug(slug): Promise<Project | null>`, `getProjectBlocks(pageId): Promise<NotionBlock[]>` 시그니처만 (본문은 `throw new Error("미구현")` 또는 빈 값)
@@ -79,14 +79,14 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `.env.example`에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID` 추가(설명 주석 한국어, `NEXT_PUBLIC_` 접두사 없음)
   - `npx tsc --noEmit` 통과
 
-- **Task 003: 프로젝트 컴포넌트 골격 및 더미 데이터 유틸리티 작성**
+- ✅ **Task 003: 프로젝트 컴포넌트 골격 및 더미 데이터 유틸리티 작성** - See: /tasks/003-project-components-and-mock-data.md
   - `components/projects/project-card.tsx`, `components/projects/project-grid.tsx`, `components/projects/project-header.tsx`, `components/projects/notion-blocks.tsx`, `components/projects/empty-state.tsx`, `components/projects/error-state.tsx` 빈 껍데기(props 타입만 정의)
   - `lib/notion/mock-data.ts`: `Project` 타입을 따르는 더미 프로젝트 3건 + `NotionBlock[]` 더미 본문(7종 블록·인라인 서식·연속 리스트·미지원 블록 포함) — Phase 2 전용, Phase 3에서 제거
   - 각 컴포넌트가 서버 컴포넌트임을 확인(`"use client"` 없음)
 
 ### Phase 2: UI/UX 완성 (더미 데이터 활용)
 
-- **Task 004: 프로젝트 카드 및 목록 그리드 UI 구현**
+- **Task 004: 프로젝트 카드 및 목록 그리드 UI 구현** - 우선순위
   - `project-card.tsx`: shadcn `card` + `badge`로 제목·`Outcome`·기간(`Period End` 없으면 "진행 중")·`Tags` 배지 렌더. 제목 `<Link>`에 접근 가능한 이름 부여(카드 전체 링크 금지, §10 접근성)
   - 기간 포맷 유틸 `lib/format-period.ts`(ISO → `2025.03 – 2025.08` / `2025.03 – 진행 중`)
   - `project-grid.tsx`: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
