@@ -6,7 +6,7 @@ Notion을 CMS로 사용하는 개인 포트폴리오 웹사이트입니다. 프�
 
 ## 현재 상태
 
-**기획 단계입니다.** MVP 요구사항은 [`docs/PRD.md`](docs/PRD.md)에 정의되어 있고, Notion 연동 구현은 아직 시작하지 않았습니다. 저장소에는 Next.js 스타터 킷의 레이아웃 셸(Navbar / Footer / 다크 모드)과 정적 페이지 2개(`/`, `/about`)만 있습니다. 네비게이션의 `/projects` 링크는 M2에서 라우트가 만들어지기 전까지 404입니다.
+**기획 단계입니다.** MVP 요구사항은 [`docs/PRD.md`](docs/PRD.md)에 정의되어 있고, Notion 연동 구현은 아직 시작하지 않았습니다. 저장소에는 Next.js 스타터 킷의 레이아웃 셸(Navbar / Footer / 다크 모드), 정적 페이지 2개(`/`, `/about`), 그리고 `/projects`·`/projects/[slug]` 라우트 골격(자리표시 문구만, Phase 2에서 UI 구현)이 있습니다.
 
 구현 순서는 PRD의 마일스톤을 따릅니다.
 

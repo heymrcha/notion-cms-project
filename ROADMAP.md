@@ -63,7 +63,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 1: 애플리케이션 골격 구축
 
-- **Task 001: 프로젝트 라우트 골격 및 특수 파일 생성** - 우선순위
+- ✅ **Task 001: 프로젝트 라우트 골격 및 특수 파일 생성** - See: /tasks/001-routes-skeleton.md
   - `app/projects/page.tsx` 빈 껍데기 생성(`metadata` 제목 `` `프로젝트 | ${SITE_CONFIG.name}` ``, 컨테이너 클래스, 자리표시 문구)
   - `app/projects/[slug]/page.tsx` 빈 껍데기 생성(`params`는 Next.js 16 규약에 맞춰 Promise로 처리, 로컬 문서로 확인)
   - `app/projects/loading.tsx`, `app/projects/[slug]/loading.tsx` 자리 파일(내용은 Phase 4 F7에서 채움)
@@ -71,7 +71,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `SITE_CONFIG.navLinks`의 `/projects`가 더 이상 404가 아님을 개발 서버에서 확인
   - F5 잔여 확인: `/docs` 삭제·`v1.0.0` 배지 제거·스타터 문구 정리가 워킹 트리에 반영됐는지 재점검 후 커밋
 
-- **Task 002: Notion 타입 정의 및 페치 계층 파일 골격 작성**
+- **Task 002: Notion 타입 정의 및 페치 계층 파일 골격 작성** - 우선순위
   - `lib/notion/types.ts`: PRD §7.1 `Project` 타입, `ProjectListItem`(카드에 필요한 필드 부분집합), `NotionBlock` 유니온(§6.3 7종 + `RichText` 인라인 서식: 굵게·기울임·인라인 코드·링크)
   - `lib/notion/client.ts`: 단일 인스턴스 export 시그니처(`server-only` import로 클라이언트 번들 유입 차단, 구현은 Phase 3)
   - `lib/notion/queries.ts`: `getPublishedProjects(): Promise<Project[]>`, `getProjectBySlug(slug): Promise<Project | null>`, `getProjectBlocks(pageId): Promise<NotionBlock[]>` 시그니처만 (본문은 `throw new Error("미구현")` 또는 빈 값)

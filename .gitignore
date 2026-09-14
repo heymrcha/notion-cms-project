@@ -43,3 +43,9 @@ next-env.d.ts
 
 # claude code 개인 로컬 설정
 .claude/settings.local.json
+
+# shrimp-task-manager 작업 데이터 (개인 도구, MCP DATA_DIR 상대경로)
+shrimp_data/
+
+# Playwright MCP 브라우저 검증 산출물 (스냅샷·콘솔 로그)
+.playwright-mcp/
