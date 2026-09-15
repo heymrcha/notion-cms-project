@@ -1,5 +1,6 @@
 import "server-only"
 
+import { cache } from "react"
 import type {
   QueryDataSourceParameters,
   QueryDataSourceResponse,
@@ -61,8 +62,10 @@ function dedupeBySlug(projects: Project[]): Project[] {
   })
 }
 
-// 실패 시 null(오류 상태), 0건이면 [](빈 상태) — 호출부가 두 경우를 구분해 렌더한다 (PRD F6)
-export async function getPublishedProjects(): Promise<Project[] | null> {
+// 실패 시 null(오류 상태), 0건이면 [](빈 상태) — 호출부가 두 경우를 구분해 렌더한다 (PRD F6).
+// SDK 호출은 fetch 처럼 자동 메모이즈되지 않으므로 React cache 로 같은 렌더 안의 중복 호출을 막는다
+// (generateMetadata 와 페이지가 같은 데이터를 읽는다 — Next 문서 generate-metadata.md)
+export const getPublishedProjects = cache(async (): Promise<Project[] | null> => {
   return safeFetch(
     "getPublishedProjects",
     async () => {
@@ -74,10 +77,10 @@ export async function getPublishedProjects(): Promise<Project[] | null> {
     },
     null
   )
-}
+})
 
 // 미발행 초안이 URL 추측으로 노출되지 않도록 Published 필터를 AND 로 함께 건다 (PRD §6.1)
-export async function getProjectBySlug(slug: string): Promise<Project | null> {
+export const getProjectBySlug = cache(async (slug: string): Promise<Project | null> => {
   return safeFetch(
     `getProjectBySlug(${slug})`,
     async () => {
@@ -94,7 +97,7 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     },
     null
   )
-}
+})
 
 export async function getProjectBlocks(pageId: string): Promise<NotionBlock[]> {
   return safeFetch(

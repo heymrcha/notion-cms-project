@@ -136,7 +136,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `NOTION_API_KEY`가 클라이언트 번들에 없는지 확인(`npm run build` 후 `.next/static` grep)
   - **완료 판정(M1)**: 임시 서버 컴포넌트에서 `getPublishedProjects()` 출력 시 3건이 정렬 규칙대로, 미발행 1건 제외, `npx tsc --noEmit` 통과. Playwright MCP로 화면 출력 확인
 
-- **Task 010: 더미 데이터를 실제 Notion 데이터로 교체 및 에러 처리 연결** - 우선순위
+- ✅ **Task 010: 더미 데이터를 실제 Notion 데이터로 교체 및 에러 처리 연결** - See: /tasks/010-connect-real-data.md
   - `app/projects/page.tsx`: Task 004에서 만든 `Project[] | null` 분기(`null` → `ErrorState`, `[]` → `EmptyState`, 404 아님)를 유지한 채 `MOCK_PROJECTS` 대입만 `getPublishedProjects()` 호출로 교체
   - `app/projects/[slug]/page.tsx`: `getProjectBySlug()` → 없거나 미발행이면 `notFound()`, 있으면 `getProjectBlocks()`로 본문 렌더. 페치 예외는 `error.tsx`가 받도록 처리
   - `app/page.tsx`: 최근 3건을 실제 데이터로 교체(실패 시 섹션 숨김)
@@ -144,7 +144,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `generateMetadata`: 제목 `` `${Title} | ${SITE_CONFIG.name}` ``, `description`은 `Summary`
   - Playwright MCP로 실제 데이터 목록·상세·404(없는 slug / 미발행 slug)·외부 링크 확인
 
-- **Task 011: ISR 적용 및 프로덕션 빌드 검증 (M3)**
+- **Task 011: ISR 적용 및 프로덕션 빌드 검증 (M3)** - 우선순위
   - `app/projects/page.tsx`, `app/projects/[slug]/page.tsx`에 `export const revalidate = 60`
   - `generateStaticParams`가 발행된 slug 목록 반환. Notion 실패 시 빈 배열 반환(R3: 빌드 실패시키지 않음), `dynamicParams` 기본값(허용) 유지로 빌드 후 추가된 프로젝트도 첫 요청에 생성
   - `generateStaticParams`는 재검증 시 재호출되지 않음을 문서로 확인하고 주석에 "왜" 남김

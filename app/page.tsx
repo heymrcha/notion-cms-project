@@ -2,13 +2,12 @@ import Link from "next/link"
 
 import { ProjectGrid } from "@/components/projects/project-grid"
 import { Button } from "@/components/ui/button"
-import { MOCK_PROJECTS } from "@/lib/notion/mock-data"
-import { sortProjects } from "@/lib/notion/sort-projects"
+import { getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
 
-export default function Home() {
-  // TODO: Task 010 에서 getPublishedProjects() 로 교체 (실패·0건이면 섹션 숨김)
-  const recentProjects = sortProjects(MOCK_PROJECTS).slice(0, 3)
+export default async function Home() {
+  // 페치 실패(null)와 0건([]) 모두 섹션을 숨긴다 — 홈은 오류·빈 상태 문구를 띄우지 않는다
+  const recentProjects = (await getPublishedProjects())?.slice(0, 3) ?? []
 
   return (
     <div className="flex flex-col">
