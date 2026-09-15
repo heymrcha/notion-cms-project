@@ -110,7 +110,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - 본문 타이포그래피는 토큰 색만 사용, heading 레벨 건너뛰지 않음(§10)
   - Playwright MCP로 더미 본문의 7종 블록·인라인 서식·리스트 묶기·미지원 블록 스킵 시각 확인
 
-- **Task 007: 홈 히어로 및 최근 프로젝트 3건 섹션 구현** - 우선순위
+- ✅ **Task 007: 홈 히어로 및 최근 프로젝트 3건 섹션 구현** - See: /tasks/007-home-recent-projects.md
   - `app/page.tsx` 히어로: 포트폴리오 소개 문구(`SITE_CONFIG.name`/`description` 참조) + `/projects` CTA 버튼
   - "최근 프로젝트" 섹션: Task 004의 `sortProjects`(`lib/notion/sort-projects.ts`)로 정렬한 상위 3건을 `project-card.tsx` 재사용으로 렌더 + "전체 보기" 링크(더미 데이터)
   - 0건이면 섹션 자체를 숨김(홈은 빈 상태 문구를 띄우지 않음)
@@ -119,7 +119,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 3: 핵심 기능 구현
 
-- **Task 008: Notion Database 준비 및 SDK 설치 (M1 선행)**
+- **Task 008: Notion Database 준비 및 SDK 설치 (M1 선행)** - 우선순위
   - `npm i @notionhq/client` 설치 후 **설치된 버전의 타입 정의를 먼저 확인**(R1: `dataSources.query`가 존재하는지, `databases.query`는 쓰지 않음)
   - Context7로 `@notionhq/client` 최신 문서(`dataSources.query`, `blocks.children.list`, 페이지네이션, 에러 코드) 조회
   - Projects Database 페이지에 통합(Integration) 연결 권한 부여(사용자 수작업). 미완료 시 API가 `object_not_found`를 반환하므로 Task 009 착수 전 반드시 확인
