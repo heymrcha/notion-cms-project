@@ -25,9 +25,9 @@
 - [x] 로컬 프로덕션 Lighthouse(모바일 프리셋) `/projects` LCP ≤ 2.5s, CLS ≤ 0.1 — 수치 기록
 - [x] README에 Notion 설정(통합 생성 → DB 연결 권한 → data source ID 확인 → `.env.local`)과 Vercel 배포 절차가 한국어로 있다
 - [x] README "현재 상태"가 기획 단계 문구에서 구현 완료 상태로 갱신됐다
-- [ ] Vercel 배포 URL에서 `/projects` 200, Lighthouse 재측정 수치 기록
-- [ ] 배포 URL에서 S1·S2·S3 재검증
-- [ ] `SITE_CONFIG.siteUrl`이 실제 배포 도메인
+- [x] Vercel 배포 URL에서 `/projects` 200, Lighthouse 재측정 수치 기록
+- [x] 배포 URL에서 S1·S2·S3 재검증
+- [x] `SITE_CONFIG.siteUrl`이 실제 배포 도메인
 - [x] `npx tsc --noEmit` 오류 0
 - [x] `npm run lint` 오류 0
 
@@ -36,23 +36,23 @@
 - [x] 1. `npm run build && npm run start -p 3001` 후 `npx lighthouse`(모바일 프리셋, headless)로 `/projects` 측정.
 - [x] 2. 미달 시 이미지 `priority`/`sizes`·폰트·카드 수 조정 후 재측정.
 - [x] 3. README 갱신.
-- [ ] 4. Vercel 연결·환경 변수 등록(사용자 수작업) — 안내 후 대기.
-- [ ] 5. 배포 URL에서 Lighthouse·S1~S3 재검증, `siteUrl` 확정.
-- [ ] 6. 체크박스 갱신, `ROADMAP.md` Task 014 ✅.
+- [x] 4. Vercel 연결·환경 변수 등록(사용자 수작업) — 안내 후 대기.
+- [x] 5. 배포 URL에서 Lighthouse·S1~S3 재검증, `siteUrl` 확정.
+- [x] 6. 체크박스 갱신, `ROADMAP.md` Task 014 ✅.
 
 ## 테스트 체크리스트
 
 ### 정상 흐름
 
 - [x] 로컬 프로덕션 Lighthouse 모바일: LCP·CLS·FCP·TBT 수치
-- [ ] 배포 URL Lighthouse 모바일: 동일 수치
-- [ ] 배포 URL: `/`, `/projects`, `/projects/subscription-checkout`, `/sitemap.xml`, `/robots.txt` 200
+- [x] 배포 URL Lighthouse 모바일: 동일 수치
+- [x] 배포 URL: `/`, `/projects`, `/projects/subscription-checkout`, `/sitemap.xml`, `/robots.txt` 200
 
 ### 예외·엣지 케이스
 
-- [ ] 배포 URL S3: Notion `Published` 해제 → 60초 후 목록 제외·상세 404 → 원복
-- [ ] 배포 URL S2: 제목 수정 → 60초 후 반영 → 원복
-- [ ] 배포 URL 없는 slug 404
+- [x] 배포 URL S3: Notion `Published` 해제 → 60초 후 목록 제외·상세 404 → 원복
+- [x] 배포 URL S2: 제목 수정 → 60초 후 반영 → 원복
+- [x] 배포 URL 없는 slug 404
 
 ### 정적 검증
 
@@ -84,3 +84,27 @@
 1. GitHub `main`을 최신으로 푸시(위 변경 포함).
 2. Vercel에서 저장소 Import, 환경 변수 `NOTION_API_KEY`·`NOTION_PROJECTS_DATA_SOURCE_ID` 등록, Deploy.
 3. 배포 URL을 알려 주면 Lighthouse 재측정·S1~S3 재검증·`siteUrl` 확정을 이어서 진행한다.
+
+## 진행 기록 (2/2 — 배포 검증)
+
+### 배포
+
+- 사용자가 Vercel에 Import·환경 변수 등록·Deploy. 처음엔 Vercel Authentication(배포 보호)이 켜져 있어 모든 경로가 SSO로 302 → 사용자가 해제. 프로덕션 도메인 **https://notion-cms-project-kohl.vercel.app** (`notion-cms-project.vercel.app`은 다른 프로젝트가 선점해 404).
+- `SITE_CONFIG.siteUrl`을 위 도메인으로 확정(U3). `sitemap.xml`·`robots.txt`가 다음 배포부터 이 값을 쓴다.
+- 배포 URL 확인: `/`, `/projects`, 상세 200(`x-vercel-cache: HIT/STALE`), `/projects/no-such-slug`·`draft-unpublished` 404, `/sitemap.xml`·`/robots.txt` 200, `/_next/image` webp 200.
+
+### Lighthouse (배포 URL, 모바일 프리셋, 3회)
+
+| 회차 | LCP | CLS | FCP | TBT | 점수 |
+|---|---|---|---|---|---|
+| 1 | 2.2s | 0 | 0.9s | 0ms | 99 |
+| 2 | **2.0s** | **0** | 0.9s | 0ms | 99 |
+| 3 | 2.0s | 0 | 0.9s | 0ms | 99 |
+
+**S4 통과** (LCP ≤ 2.5s, CLS ≤ 0.1). 로컬 2.5s → 배포 2.0s: Brotli·HTTP/2·CDN 효과.
+
+### S2·S3 (배포 URL, Notion MCP로 조작 → 원복)
+
+- S2 제목 수정: t0 옛 제목(HIT/STALE) → +62s 목록 새 제목 → +68s 상세 새 제목. Vercel CDN의 stale-while-revalidate로 목록·상세가 각자 재검증됨.
+- S3 Published 해제: +62s 유지 → +65s 목록 3→2건, 상세 200→404.
+- 원복 후 62초 뒤 목록 3건·상세 200·원래 제목 복귀 확인.

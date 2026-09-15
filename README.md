@@ -131,7 +131,7 @@ npx shadcn@latest add [component-name]
 2. **Environment Variables**에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID`를 등록합니다(Production·Preview 모두).
 3. Deploy. 빌드 로그에서 `/projects`·`/projects/[slug]`가 `Revalidate 1m`으로 표시되고 발행된 slug가 프리렌더되면 정상입니다.
 4. 배포 도메인이 정해지면 `lib/site-config.ts`의 `siteUrl`을 그 값으로 바꿉니다. `sitemap.xml`·`robots.txt`가 이 값을 씁니다.
-5. 배포 URL에서 Notion 제목을 수정하고 60초 뒤 새로고침 2회로 반영을 확인합니다(PRD S1~S3).
+5. 배포 URL(현재 https://notion-cms-project-kohl.vercel.app)에서 Notion 제목을 수정하고 60초 뒤 새로고침 2회로 반영을 확인합니다(PRD S1~S3).
 
 ### 호스팅을 바꾸는 경우
 
