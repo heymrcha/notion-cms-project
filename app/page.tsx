@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button"
 import { getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
 
+// 최근 프로젝트 3건도 Notion 에서 오므로 목록·상세와 같은 주기로 재검증해야 홈만 오래된 채 남지 않는다 (PRD §8, G2)
+export const revalidate = 60
+
 export default async function Home() {
   // 페치 실패(null)와 0건([]) 모두 섹션을 숨긴다 — 홈은 오류·빈 상태 문구를 띄우지 않는다
   const recentProjects = (await getPublishedProjects())?.slice(0, 3) ?? []

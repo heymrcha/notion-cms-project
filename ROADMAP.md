@@ -144,15 +144,15 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `generateMetadata`: 제목 `` `${Title} | ${SITE_CONFIG.name}` ``, `description`은 `Summary`
   - Playwright MCP로 실제 데이터 목록·상세·404(없는 slug / 미발행 slug)·외부 링크 확인
 
-- **Task 011: ISR 적용 및 프로덕션 빌드 검증 (M3)** - 우선순위
-  - `app/projects/page.tsx`, `app/projects/[slug]/page.tsx`에 `export const revalidate = 60`
+- ✅ **Task 011: ISR 적용 및 프로덕션 빌드 검증 (M3)** - See: /tasks/011-isr-production-build.md
+  - `app/projects/page.tsx`, `app/projects/[slug]/page.tsx`에 `export const revalidate = 60` (홈 `app/page.tsx`도 최근 3건이 Notion 데이터라 같은 값 적용)
   - `generateStaticParams`가 발행된 slug 목록 반환. Notion 실패 시 빈 배열 반환(R3: 빌드 실패시키지 않음), `dynamicParams` 기본값(허용) 유지로 빌드 후 추가된 프로젝트도 첫 요청에 생성
   - `generateStaticParams`는 재검증 시 재호출되지 않음을 문서로 확인하고 주석에 "왜" 남김
   - `npm run build` → `npm run start`로 프로덕션 실행, 빌드 로그에서 `/projects`와 `/projects/[slug]`가 ISR로 표기되는지 확인
   - Notion에서 제목 수정 → 60초 대기 → 2회 새로고침으로 반영 실측(S1·S2), `Published` 해제 → 목록에서 사라지고 상세 404(S3)
   - `npm run lint` 오류 0(S6)
 
-- **Task 011-1: 핵심 기능 통합 테스트 (Playwright MCP)**
+- ✅ **Task 011-1: 핵심 기능 통합 테스트 (Playwright MCP)** - See: /tasks/011-1-integration-test.md
   - S1: Notion에 프로젝트 1건 추가·`Published` 체크 → 60초 후 목록·상세 노출
   - S2: 제목·요약 수정 → 60초 후 반영
   - S3: `Published` 해제 → 목록 제외, 상세 URL 404
@@ -163,7 +163,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 4: 고급 기능 및 최적화
 
-- **Task 012: 로딩 스켈레톤 및 Cover 이미지 적용 (F7·F8)**
+- **Task 012: 로딩 스켈레톤 및 Cover 이미지 적용 (F7·F8)** - 우선순위
   - 스켈레톤은 `loading.tsx`가 아니라 **페이지 내부 `<Suspense>`** 로 구현(R5: `loading.tsx`는 `notFound()`의 404를 막음). 상세는 `getProjectBySlug` → `notFound()`를 Suspense 밖에서 끝낸 뒤 본문(`getProjectBlocks`)만 Suspense로 감싸 스켈레톤(`animate-pulse`, 토큰 색) 노출. CLS 방지를 위해 실제 레이아웃과 동일한 치수
   - R2 해소: Next.js 16 로컬 문서(`node_modules/next/dist/docs/`)로 `images.remotePatterns` 스키마 확인, 실제 Notion 파일 URL 호스트·경로 패턴을 API 응답에서 채취해 `next.config.ts`에 등록
   - `project-card.tsx`·`project-header.tsx`에 `next/image` 적용, `alt`는 `Title`, 고정 비율 컨테이너 유지(이미지 실패 시 레이아웃 불변)
@@ -213,6 +213,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 | U2 | 배포 대상을 Vercel로 가정 | Task 014 | 다른 호스팅이면 ISR 동작이 달라지므로 PRD §8 재검토 |
 | U3 | 도메인 연결 여부·주소 미정 | Task 013 | F10(sitemap) 착수 전 확정 필요. 미정 시 Vercel 기본 도메인으로 임시 진행 |
 | R5 | `loading.tsx`가 있으면 응답이 스트리밍되어 `notFound()`가 HTTP 404 대신 200 + `noindex` 메타로 내려감(Next 문서 `loading.md` §Status Codes) | Task 005(결정 완료), 012 | **결정: 두 `loading.tsx` 삭제**(Task 005). 개발·프로덕션·ISR 모두 404 확인. Task 012 스켈레톤은 `loading.tsx` 대신 페이지 내부 `<Suspense>`로 본문만 감싸고, `notFound()` 존재 확인은 Suspense 밖(스트리밍 전)에서 수행 |
+| R6 | 404였던 상세 엔트리가 재발행 후 처음 재생성될 때 본문은 정상이나 `<title>` 기본값 + `noindex`가 한 주기(≤60초) 남음. 다음 재검증에서 자동 복구됨(Task 011 실측, Task 011-1의 S1 경로 — 발행 전 404가 캐시된 신규 slug — 에서도 재현) | Task 011·011-1(관찰), 015 | 재발행이 드물고 창이 60초라 MVP는 수용. Task 015에서 `revalidatePath` 경로로도 재현되는지 확인하고, 재현 시 Next.js 이슈 검색·보고 |
 
 ## Phase 간 병렬 작업 가능성
 

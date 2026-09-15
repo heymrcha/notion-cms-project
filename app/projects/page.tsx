@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description: "프로덕트 매니저가 참여한 프로젝트 목록",
 }
 
+// 방문자 요청이 Notion 을 직접 치지 않도록 정적 생성하고, PRD 가 요구한 "1분 이내 반영"에 맞춰 60초마다 재검증한다 (PRD §8)
+export const revalidate = 60
+
 export default async function ProjectsPage() {
   // 정렬은 Notion 쿼리(Order desc → Period Start desc)가 이미 끝냈다
   const projects = await getPublishedProjects()

@@ -9,6 +9,7 @@ import type {
 import { getNotionClient, getNotionEnv } from "./client"
 import { mapBlock, mapPageToProject } from "./mappers"
 import { safeFetch } from "./retry"
+import { sortProjects } from "./sort-projects"
 import type { NotionBlock, Project } from "./types"
 
 type DataSourceFilter = NonNullable<QueryDataSourceParameters["filter"]>
@@ -49,15 +50,26 @@ async function queryAllPages(
   return results
 }
 
+// Notion 의 서버 정렬은 Order 가 빈 행을 방향과 무관하게 맨 뒤로 보내므로, 매퍼가 빈 값을 0 으로
+// 채운 뒤 앱 쪽에서 다시 정렬해야 "비어 있으면 0 취급"(PRD §6.1)이 지켜진다. 서버 정렬은 안정 정렬의
+// 동점 순서를 결정적으로 만들기 위해 그대로 둔다
+function toSortedProjects(pages: QueryDataSourceResponse["results"]): Project[] {
+  const projects = pages
+    .map(mapPageToProject)
+    .filter((project): project is Project => project !== null)
+  return dedupeBySlug(sortProjects(projects))
+}
+
 // Slug 가 겹치면 정렬 기준 첫 행만 남긴다. 상세 URL 이 하나의 페이지만 가리켜야 하기 때문 (PRD §11)
 function dedupeBySlug(projects: Project[]): Project[] {
-  const seen = new Set<string>()
+  const kept = new Map<string, string>()
   return projects.filter((project) => {
-    if (seen.has(project.slug)) {
-      console.warn(`[notion] Slug 중복 — "${project.slug}" 는 첫 행(${project.id} 이전)만 사용합니다`)
+    const keptId = kept.get(project.slug)
+    if (keptId) {
+      console.warn(`[notion] Slug 중복 — "${project.slug}" 는 ${keptId} 를 채택하고 ${project.id} 는 제외합니다`)
       return false
     }
-    seen.add(project.slug)
+    kept.set(project.slug, project.id)
     return true
   })
 }
@@ -70,10 +82,7 @@ export const getPublishedProjects = cache(async (): Promise<Project[] | null> =>
     "getPublishedProjects",
     async () => {
       const pages = await queryAllPages(PUBLISHED_FILTER, DEFAULT_SORTS)
-      const projects = pages
-        .map(mapPageToProject)
-        .filter((project): project is Project => project !== null)
-      return dedupeBySlug(projects)
+      return toSortedProjects(pages)
     },
     null
   )
@@ -90,10 +99,7 @@ export const getProjectBySlug = cache(async (slug: string): Promise<Project | nu
         },
         DEFAULT_SORTS
       )
-      const projects = pages
-        .map(mapPageToProject)
-        .filter((project): project is Project => project !== null)
-      return dedupeBySlug(projects)[0] ?? null
+      return toSortedProjects(pages)[0] ?? null
     },
     null
   )
