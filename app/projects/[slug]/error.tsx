@@ -1,8 +1,9 @@
 "use client" // Next.js 규약상 에러 바운더리는 클라이언트 컴포넌트여야 한다
 
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 
-// TODO: 안내 문구 다듬기 (PRD §11, Task 005)
 export default function ProjectDetailError({
   retry,
 }: {
@@ -16,7 +17,13 @@ export default function ProjectDetailError({
         <h1 className="text-2xl font-bold tracking-tight">
           프로젝트를 불러오지 못했습니다
         </h1>
-        <Button onClick={() => retry()}>다시 시도</Button>
+        <p className="text-muted-foreground">잠시 후 다시 시도해 주세요.</p>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => retry()}>다시 시도</Button>
+          <Button asChild variant="outline">
+            <Link href="/projects">목록으로</Link>
+          </Button>
+        </div>
       </div>
     </div>
   )

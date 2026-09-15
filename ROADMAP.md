@@ -66,7 +66,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 - ✅ **Task 001: 프로젝트 라우트 골격 및 특수 파일 생성** - See: /tasks/001-routes-skeleton.md
   - `app/projects/page.tsx` 빈 껍데기 생성(`metadata` 제목 `` `프로젝트 | ${SITE_CONFIG.name}` ``, 컨테이너 클래스, 자리표시 문구)
   - `app/projects/[slug]/page.tsx` 빈 껍데기 생성(`params`는 Next.js 16 규약에 맞춰 Promise로 처리, 로컬 문서로 확인)
-  - `app/projects/loading.tsx`, `app/projects/[slug]/loading.tsx` 자리 파일(내용은 Phase 4 F7에서 채움)
+  - `app/projects/loading.tsx`, `app/projects/[slug]/loading.tsx` 자리 파일(내용은 Phase 4 F7에서 채움) — Task 005에서 R5로 삭제됨
   - `app/projects/[slug]/error.tsx`(클라이언트 컴포넌트 필수 — 유일한 예외), `app/projects/[slug]/not-found.tsx` 자리 파일
   - `SITE_CONFIG.navLinks`의 `/projects`가 더 이상 404가 아님을 개발 서버에서 확인
   - F5 잔여 확인: `/docs` 삭제·`v1.0.0` 배지 제거·스타터 문구 정리가 워킹 트리에 반영됐는지 재점검 후 커밋
@@ -94,7 +94,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `empty-state.tsx`("아직 발행된 프로젝트가 없습니다"), `error-state.tsx`("프로젝트를 불러오지 못했습니다") 완성 및 목록 페이지에서 조건부 렌더 경로 확보
   - Playwright MCP로 375/768/1280에서 열 수·가로 스크롤 없음·다크 모드 대비 확인
 
-- **Task 005: 프로젝트 상세 상단 메타 UI 구현** - 우선순위
+- ✅ **Task 005: 프로젝트 상세 상단 메타 UI 구현** - See: /tasks/005-project-detail-header.md
   - `project-header.tsx`: `<h1>` 제목, `Outcome` 강조 문구, `Role`, 기간, `Tags` 배지
   - `External URL` 있을 때만 하단에 shadcn `button` 링크(`target="_blank" rel="noreferrer"`) 렌더
   - `Cover` 자리는 고정 비율 컨테이너(`aspect-video`)만 확보(이미지 자체는 Phase 4 F8)
@@ -102,7 +102,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `not-found.tsx`: "프로젝트를 찾을 수 없습니다" + `/projects` 복귀 링크. `error.tsx`: 안내 문구 + `retry` 버튼(Next.js 16.3.4 로컬 문서 기준 prop 이름은 `reset`이 아니라 `retry`이며, Task 001에서 이미 `retry` 시그니처로 작성됨)
   - Playwright MCP로 목록 → 상세 → 외부 링크 → 뒤로 가기 흐름과 404 렌더 확인
 
-- **Task 006: Notion 블록 렌더러 구현**
+- ✅ **Task 006: Notion 블록 렌더러 구현** - See: /tasks/006-notion-block-renderer.md
   - `notion-blocks.tsx`: `paragraph`→`<p>`, `heading_1/2/3`→`<h2>/<h3>/<h4>`, `quote`→`<blockquote>`, `divider`→`<hr>`, `code`→`<pre><code>`(하이라이팅 없음), `image`→고정 비율 컨테이너 + `alt`(실제 `next/image` 적용은 Phase 4 F8)
   - 연속 `bulleted_list_item` / `numbered_list_item`을 하나의 `<ul>` / `<ol>`로 묶는 그룹핑 로직(순수 함수로 분리, `lib/notion/group-blocks.ts`)
   - `rich-text.tsx`: 굵게·기울임·인라인 코드·링크 인라인 서식 렌더(`<strong>`, `<em>`, `<code>`, `<a>`)
@@ -110,7 +110,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - 본문 타이포그래피는 토큰 색만 사용, heading 레벨 건너뛰지 않음(§10)
   - Playwright MCP로 더미 본문의 7종 블록·인라인 서식·리스트 묶기·미지원 블록 스킵 시각 확인
 
-- **Task 007: 홈 히어로 및 최근 프로젝트 3건 섹션 구현**
+- **Task 007: 홈 히어로 및 최근 프로젝트 3건 섹션 구현** - 우선순위
   - `app/page.tsx` 히어로: 포트폴리오 소개 문구(`SITE_CONFIG.name`/`description` 참조) + `/projects` CTA 버튼
   - "최근 프로젝트" 섹션: Task 004의 `sortProjects`(`lib/notion/sort-projects.ts`)로 정렬한 상위 3건을 `project-card.tsx` 재사용으로 렌더 + "전체 보기" 링크(더미 데이터)
   - 0건이면 섹션 자체를 숨김(홈은 빈 상태 문구를 띄우지 않음)
@@ -164,7 +164,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 ### Phase 4: 고급 기능 및 최적화
 
 - **Task 012: 로딩 스켈레톤 및 Cover 이미지 적용 (F7·F8)**
-  - `app/projects/loading.tsx`, `app/projects/[slug]/loading.tsx`에 카드/헤더 형태 스켈레톤(`animate-pulse`, 토큰 색), CLS 방지를 위해 실제 레이아웃과 동일한 치수
+  - 스켈레톤은 `loading.tsx`가 아니라 **페이지 내부 `<Suspense>`** 로 구현(R5: `loading.tsx`는 `notFound()`의 404를 막음). 상세는 `getProjectBySlug` → `notFound()`를 Suspense 밖에서 끝낸 뒤 본문(`getProjectBlocks`)만 Suspense로 감싸 스켈레톤(`animate-pulse`, 토큰 색) 노출. CLS 방지를 위해 실제 레이아웃과 동일한 치수
   - R2 해소: Next.js 16 로컬 문서(`node_modules/next/dist/docs/`)로 `images.remotePatterns` 스키마 확인, 실제 Notion 파일 URL 호스트·경로 패턴을 API 응답에서 채취해 `next.config.ts`에 등록
   - `project-card.tsx`·`project-header.tsx`에 `next/image` 적용, `alt`는 `Title`, 고정 비율 컨테이너 유지(이미지 실패 시 레이아웃 불변)
   - `notion-blocks.tsx`의 `image` 블록에 `next/image` 적용(`sizes` 지정)
@@ -212,6 +212,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 | U1 | `/about` 경력 정보의 출처(Notion vs 하드코딩) | Task 013 | MVP는 하드코딩으로 확정. 갱신 빈도가 낮아 CMS화 이득이 작음 |
 | U2 | 배포 대상을 Vercel로 가정 | Task 014 | 다른 호스팅이면 ISR 동작이 달라지므로 PRD §8 재검토 |
 | U3 | 도메인 연결 여부·주소 미정 | Task 013 | F10(sitemap) 착수 전 확정 필요. 미정 시 Vercel 기본 도메인으로 임시 진행 |
+| R5 | `loading.tsx`가 있으면 응답이 스트리밍되어 `notFound()`가 HTTP 404 대신 200 + `noindex` 메타로 내려감(Next 문서 `loading.md` §Status Codes) | Task 005(결정 완료), 012 | **결정: 두 `loading.tsx` 삭제**(Task 005). 개발·프로덕션·ISR 모두 404 확인. Task 012 스켈레톤은 `loading.tsx` 대신 페이지 내부 `<Suspense>`로 본문만 감싸고, `notFound()` 존재 확인은 Suspense 밖(스트리밍 전)에서 수행 |
 
 ## Phase 간 병렬 작업 가능성
 
