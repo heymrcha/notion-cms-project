@@ -119,7 +119,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 3: 핵심 기능 구현
 
-- **Task 008: Notion Database 준비 및 SDK 설치 (M1 선행)** - 우선순위
+- ✅ **Task 008: Notion Database 준비 및 SDK 설치 (M1 선행)** - See: /tasks/008-notion-database-setup.md
   - `npm i @notionhq/client` 설치 후 **설치된 버전의 타입 정의를 먼저 확인**(R1: `dataSources.query`가 존재하는지, `databases.query`는 쓰지 않음)
   - Context7로 `@notionhq/client` 최신 문서(`dataSources.query`, `blocks.children.list`, 페이지네이션, 에러 코드) 조회
   - Projects Database 페이지에 통합(Integration) 연결 권한 부여(사용자 수작업). 미완료 시 API가 `object_not_found`를 반환하므로 Task 009 착수 전 반드시 확인
@@ -127,7 +127,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - ✅ 완료됨(세션 밖): 더미 프로젝트 3건(`Published` 체크, `Order`·`Period Start` 값 분산, 1건 `Period End` 비움, 1건 `External URL` 포함, 본문에 §6.3 7종 블록·인라인 서식·토글 포함) + 미발행 1건 입력 — Task 착수 시 확인만
   - ✅ 완료됨(세션 밖): `.env.local`에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID` 설정(Database ID가 아닌 data source ID임을 확인), `.gitignore`의 `.env*` 반영 확인 — Task 착수 시 확인만
 
-- **Task 009: Notion 클라이언트 및 쿼리·매퍼 구현 (M1)**
+- **Task 009: Notion 클라이언트 및 쿼리·매퍼 구현 (M1)** - 우선순위
   - `client.ts`: `server-only` + 환경 변수 누락 시 명확한 에러 메시지, `Client` 단일 인스턴스
   - `queries.ts`: `notion.dataSources.query({ data_source_id, filter: Published = true, sorts: [Order desc, Period Start desc] })`; `has_more`/`next_cursor`로 전량 페치; `getProjectBySlug`는 `Slug` equals 필터 + `Published` 필터를 AND로 적용; `getProjectBlocks`는 `blocks.children.list` 전량 페치
   - `lib/notion/retry.ts`: 429/529(`APIResponseError` 코드 `rate_limited`/`service_overload`) 시 `Retry-After` 헤더 초 존중, 없으면 지수 백오프, 최대 3회. 소진 시 빈 배열/`null` 반환 (throw 금지, 빌드 실패 방지)
