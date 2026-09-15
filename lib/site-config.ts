@@ -6,9 +6,9 @@ export const SITE_CONFIG = {
   siteUrl: "https://notion-cms-project-kohl.vercel.app",
   // 공개 연락처. 빈 문자열이면 미설정으로 보고 /about 연락 섹션에서 제외한다 (전부 비면 섹션 자체를 숨김)
   contact: {
-    email: "",
-    linkedin: "",
-    github: "",
+    email: "heymrc@gmail.com",
+    linkedin: "https://www.linkedin.com/in/minseok-kim-4b349a22b/",
+    github: "https://github.com/heymrcha",
   },
   navLinks: [
     { href: "/", label: "홈" },
