@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { ExternalLink, Mail } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -49,6 +50,19 @@ const SKILLS = [
   "Figma",
 ] as const
 
+// 값이 있는 항목만 남긴다. 전부 비어 있으면 섹션을 렌더하지 않아 자리 표본이 노출되지 않는다 (U4).
+// lucide-react 1.x 는 브랜드 아이콘(GitHub·LinkedIn)을 제공하지 않아 외부 링크 아이콘으로 통일한다
+const CONTACT_LINKS = [
+  {
+    label: "이메일",
+    href: SITE_CONFIG.contact.email ? `mailto:${SITE_CONFIG.contact.email}` : "",
+    icon: Mail,
+    external: false,
+  },
+  { label: "LinkedIn", href: SITE_CONFIG.contact.linkedin, icon: ExternalLink, external: true },
+  { label: "GitHub", href: SITE_CONFIG.contact.github, icon: ExternalLink, external: true },
+].filter((link) => link.href !== "")
+
 export default function AboutPage() {
   return (
     <div className="container mx-auto max-w-screen-2xl px-4 py-16">
@@ -94,6 +108,28 @@ export default function AboutPage() {
             ))}
           </ul>
         </section>
+
+        {CONTACT_LINKS.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">연락</h2>
+            <ul className="flex flex-wrap gap-2">
+              {CONTACT_LINKS.map(({ label, href, icon: Icon, external }) => (
+                <li key={label}>
+                  <Button asChild variant="outline">
+                    <a
+                      href={href}
+                      target={external ? "_blank" : undefined}
+                      rel={external ? "noreferrer" : undefined}
+                    >
+                      <Icon aria-hidden="true" />
+                      {label}
+                    </a>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <Button asChild variant="outline">
           <Link href="/projects">프로젝트 보러 가기</Link>

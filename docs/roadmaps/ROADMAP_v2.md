@@ -76,14 +76,14 @@ ROADMAP_v1의 Task 001~017이 전부 완료·배포됐다. 현재 운영 중인 
 
 ### Phase 5: 운영 안정화·신규 요구
 
-- **Task 018: `/about` 연락처 링크 추가 (방명록 대체)** - 우선순위
+- ✅ **Task 018: `/about` 연락처 링크 추가 (방명록 대체)** - See: /tasks/018-about-contact-links.md
   - 배경: 방문자가 글을 남기는 기능(방명록) 검토 요청 → PRD N1·N2·N6 충돌과 채용용 포트폴리오에서의 실효성 부족으로 **보류**하고 연락처 링크로 대체(§"보류" 참조). shrimp ID `2aa9cb04-58af-4ed0-8831-80cf14f775aa`
   - `lib/site-config.ts`에 `contact: { email, linkedin, github }` 추가(각 선택, 빈 문자열 = 미설정). `as const` 유지, 사이트 정보 단일 출처 원칙. 실제 값은 사용자가 채운다
   - `app/about/page.tsx` 하단 "연락" 섹션: 값이 있는 항목만 모듈 스코프 상수 배열 + `.map()`으로 렌더. 이메일은 `mailto:`, LinkedIn·GitHub는 `target="_blank" rel="noreferrer"`. lucide 아이콘(`Mail`, 외부 링크는 `ExternalLink` — lucide-react 1.x 에 브랜드 아이콘 없음) + shadcn `Button asChild variant="outline"`
   - 세 값이 전부 비면 섹션 자체를 숨긴다(자리 표본 노출 금지). 클라이언트 훅 없음, 개인정보 수집 없음, Footer 노출은 범위 밖
   - 검증: `npx tsc --noEmit`·`npm run lint` 오류 0. Playwright MCP로 (1) 값 설정 시 링크 3개의 `href`·`target`·`rel` 확인, (2) 일부만 설정 시 해당 항목만 렌더, (3) 전부 빈 값 시 섹션 미렌더, (4) 375/1280 가로 스크롤 없음·다크 모드 대비·접근성 스냅샷에서 링크에 접근 가능한 이름 확인
 
-- **Task 019: Cover 이미지 서명 URL 프록시 Route Handler 구현 (R7)**
+- **Task 019: Cover 이미지 서명 URL 프록시 Route Handler 구현 (R7)** - 우선순위
   - 문제: Notion 파일 URL은 요청마다 `X-Amz-Signature`가 바뀌고 1시간 뒤 만료. ISR 재생성마다 새 URL이 HTML에 들어가 `next/image`가 매번 다른 원본으로 취급 → Vercel Image Optimization transformations 누적(무료 월 5,000). 1시간 이상 미방문 페이지는 STALE 응답에 만료 URL이 남아 깨진 이미지가 1회 노출됨
   - 착수 전 Vercel Image Optimization 과금 규칙(transformations 산정 단위, 동일 원본 판정 기준)을 Context7·공식 문서로 재확인하고 작업 파일에 근거를 남긴다
   - `app/api/cover/[pageId]/route.ts`: `pageId`로 Notion 페이지의 `Cover` 파일 URL을 재조회해 이미지 바이트를 스트리밍하거나 302로 전달. 응답 `Cache-Control`은 만료(1시간)보다 짧게(예: `s-maxage=3000`). 잘못된 `pageId`·Cover 없음은 404, Notion 실패는 502(흰 화면·빌드 실패 없음). `pageId` 형식 검증(UUID) 후에만 Notion 호출

@@ -133,7 +133,7 @@ npm run dev                  # http://localhost:3000
 
 ### 콘텐츠의 단일 출처
 
-사이트 이름, 설명, 네비게이션 링크는 `lib/site-config.ts`의 `SITE_CONFIG` 한 곳에만 존재합니다. `app/layout.tsx`의 메타데이터, Navbar, Footer, 각 페이지가 모두 이 값을 참조하므로 **이름이나 메뉴를 바꿀 때는 이 파일만 고치면 됩니다.**
+사이트 이름, 설명, 네비게이션 링크, 공개 연락처(`contact` — 비워 두면 `/about` 연락 섹션이 숨겨집니다)는 `lib/site-config.ts`의 `SITE_CONFIG` 한 곳에만 존재합니다. `app/layout.tsx`의 메타데이터, Navbar, Footer, 각 페이지가 모두 이 값을 참조하므로 **이름이나 메뉴를 바꿀 때는 이 파일만 고치면 됩니다.**
 
 ## 스크립트
 
