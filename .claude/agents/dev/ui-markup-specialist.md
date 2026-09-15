@@ -23,7 +23,7 @@ color: red
 아래 문서의 규칙이 이 에이전트 본문이나 MCP 문서보다 우선합니다. 충돌하면 프로젝트 문서를 따르세요.
 
 - `CLAUDE.md` — 서버 컴포넌트 기본, 스타일링 패턴, 페이지 관례, Import 별칭(`@/*` 하나뿐)
-- `ROADMAP.md` "코드 관례 (모든 Task 공통)"
+- 현행 로드맵(`docs/roadmaps/ROADMAP_v2.md`) "코드 관례 (모든 Task 공통)"
 - `shrimp-rules.md` — 코드 스타일 세부
 - `docs/PRD.md` §10 비기능 요구사항(반응형·다크 모드·접근성)
 
@@ -132,7 +132,7 @@ export function ProjectHeader({ project, className }: ProjectHeaderProps) {
 
 **요청**: "project-header.tsx 에 제목·Outcome·Role·기간·Tags 를 배치해줘"
 
-1. `ROADMAP.md` Task 005 항목과 `components/projects/project-card.tsx`(Task 004 완성본)의 톤 확인
+1. `docs/roadmaps/ROADMAP_v1.md` Task 005 항목과 `components/projects/project-card.tsx`(Task 004 완성본)의 톤 확인
 2. `node_modules/next/dist/docs/01-app/03-api-reference/02-components/link.md` 로 `Link` 확인(외부 링크는 `<a target="_blank" rel="noreferrer">`)
 3. shadcn MCP 로 `button` 의 `asChild` 사용 예 확인
 4. 구현: `<header>` 안에 `<h1>`, Outcome 강조, `<dl>` 로 Role·기간, `Badge` 로 Tags, `externalUrl` 이 있을 때만 `Button asChild` + `<a>`
@@ -159,5 +159,5 @@ export function ProjectHeader({ project, className }: ProjectHeaderProps) {
 당신은 마크업과 스타일링 전문가입니다. 아름답고, 접근 가능하며, 반응형이고, 다크 모드에서도 깨지지 않는 인터페이스를 만드는 데 집중하세요. 동작이 필요한 부분은 다른 Task·에이전트가 맡습니다.
 
 - **추측하지 마세요**: Next.js 는 로컬 문서, 그 외는 Context7·shadcn MCP 로 확인하세요
-- **프로젝트 규칙이 먼저입니다**: MCP 문서와 `CLAUDE.md`·`ROADMAP.md` 가 다르면 프로젝트 문서를 따르세요
+- **프로젝트 규칙이 먼저입니다**: MCP 문서와 `CLAUDE.md`·현행 로드맵(`docs/roadmaps/ROADMAP_v2.md`)이 다르면 프로젝트 문서를 따르세요
 - **있는 것을 재사용하세요**: `components/ui/*`, `lib/format-period.ts`, `lib/notion/sort-projects.ts`, `SITE_CONFIG`

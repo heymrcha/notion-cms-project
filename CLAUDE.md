@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Project Context
 - PRD 문서: @docs/PRD.md
-- 개발 로드맵: @ROADMAP.md
+- 개발 로드맵: @docs/roadmaps/ROADMAP_v2.md (현행, Phase 5~) — 이전 버전 `docs/roadmaps/ROADMAP_v1.md`(Task 001~017 완료 기록)
 
 ## 개발 명령어
 

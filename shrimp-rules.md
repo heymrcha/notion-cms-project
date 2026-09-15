@@ -1,6 +1,6 @@
 # Development Guidelines
 
-> AI 에이전트 전용 운영 규칙. 사람용 설명은 `README.md`, 요구사항은 `docs/PRD.md`, 순서는 `ROADMAP.md`를 본다. 이 문서는 **어떤 파일을 어떻게 고치는가**만 다룬다.
+> AI 에이전트 전용 운영 규칙. 사람용 설명은 `README.md`, 요구사항은 `docs/PRD.md`, 순서는 `docs/roadmaps/ROADMAP_v2.md`(현행)를 본다. 완료된 v1 Task 는 `docs/roadmaps/ROADMAP_v1.md`. 이 문서는 **어떤 파일을 어떻게 고치는가**만 다룬다.
 
 ## 1. 프로젝트 개요
 
@@ -22,7 +22,7 @@
 | `lib/site-config.ts` | 사이트 이름·설명·메뉴 단일 출처 | 페이지 추가 시 `navLinks` 갱신 |
 | `lib/notion/*` | (신규) 페치·매핑 계층 | 아래 §5 |
 | `docs/PRD.md` | 요구사항 | 기능 ID(F1~F13)·섹션(§)을 주석·Task 파일에서 인용 |
-| `ROADMAP.md` | 작업 순서·상태 | Task 완료 시 ✅ 표기 |
+| `docs/roadmaps/ROADMAP_v2.md` | 작업 순서·상태(현행). `ROADMAP_v1.md`는 완료 기록 | Task 완료 시 ✅ 표기 |
 | `tasks/XXX-*.md` | 작업 파일 | `tasks/000-sample.md` 구조 복제 |
 | `.claude/agents/dev/*` | 보조 에이전트 | `development-planner`(로드맵), `starter-cleaner`(템플릿 정리) |
 | `shrimp_data/` | shrimp-task-manager 작업 데이터(gitignore) | 수동 편집·커밋 금지. shrimp 도구로만 갱신 |
@@ -104,17 +104,17 @@ const data: any = await res.json()
 | 색 토큰 추가 | `app/globals.css`의 `@theme inline` + `:root` + `.dark` |
 | 환경 변수 추가 | `.env.example`(한국어 주석, 값 비움) + `README.md` 환경 변수 표 + `lib/notion/client.ts` 누락 검사 |
 | `Project` 타입 필드 변경 | `lib/notion/types.ts` → `mappers.ts` → `mock-data.ts`(존재 시) → 사용하는 `components/projects/*` |
-| Task 완료 | `tasks/XXX-*.md` 체크박스·"변경 사항 요약" 추가 + `ROADMAP.md` 해당 Task `✅` + `See: /tasks/XXX-….md` |
+| Task 완료 | `tasks/XXX-*.md` 체크박스·"변경 사항 요약" 추가 + `docs/roadmaps/ROADMAP_v2.md` 해당 Task `✅` + `See: /tasks/XXX-….md` |
 | `next.config.ts` `images.remotePatterns` 추가 | 실제 Notion 응답 URL 호스트를 먼저 채취해 근거로 남김(R2) |
 | `lib/notion/mock-data.ts` 삭제(Task 010) | `app/page.tsx`, `app/projects/**`, 컴포넌트의 import 전부 제거 |
 
 ## 8. 작업 흐름 규칙
 
-1. Task 착수 전 `ROADMAP.md`에서 다음 미완료 Task 확인 → `tasks/000-sample.md` 구조로 `tasks/XXX-description.md` 생성(빈 체크박스, 변경 요약 없음)
+1. Task 착수 전 `docs/roadmaps/ROADMAP_v2.md`에서 다음 미완료 Task 확인 → `tasks/000-sample.md` 구조로 `tasks/XXX-description.md` 생성(빈 체크박스, 변경 요약 없음)
 2. Next.js 관련 코드면 §4 문서 먼저 읽기. Notion SDK면 Context7로 `@notionhq/client` 문서 조회
 3. 구현 → 단계마다 Task 파일 체크박스 갱신
 4. `npx tsc --noEmit` 0 → `npm run lint` 0 → Playwright MCP로 Task 파일 "테스트 체크리스트" 수행(375/768/1280, 다크 모드)
-5. Task 파일 끝에 "변경 사항 요약" 추가, `ROADMAP.md` ✅
+5. Task 파일 끝에 "변경 사항 요약" 추가, `docs/roadmaps/ROADMAP_v2.md` ✅
 6. **각 Task 완료 후 중단하고 지시 대기.** 커밋은 요청받았을 때만, 메시지는 한국어
 7. `js`/`tsx` 수정 후 브라우저 확인 시 하드 리로드
 

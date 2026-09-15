@@ -6,7 +6,7 @@ Notion을 CMS로 사용하는 개인 포트폴리오 웹사이트입니다. 프�
 
 ## 현재 상태
 
-**MVP 구현 완료, 배포 단계입니다.** Notion Database 연동(`lib/notion/*`), 프로젝트 목록·상세 화면, Notion 블록 렌더러, ISR(60초 재검증), 스켈레톤·이미지 최적화, `/about`, `sitemap.xml`·`robots.txt`까지 구현되어 있습니다. 진행 상황은 [`ROADMAP.md`](ROADMAP.md), 요구사항은 [`docs/PRD.md`](docs/PRD.md), 작업별 기록은 [`tasks/`](tasks/)에 있습니다.
+**MVP 구현 완료, 배포 단계입니다.** Notion Database 연동(`lib/notion/*`), 프로젝트 목록·상세 화면, Notion 블록 렌더러, ISR(60초 재검증), 스켈레톤·이미지 최적화, `/about`, `sitemap.xml`·`robots.txt`까지 구현되어 있습니다. 진행 상황은 [`docs/roadmaps/ROADMAP_v2.md`](docs/roadmaps/ROADMAP_v2.md)(MVP 완료 기록은 [`ROADMAP_v1.md`](docs/roadmaps/ROADMAP_v1.md)), 요구사항은 [`docs/PRD.md`](docs/PRD.md), 작업별 기록은 [`tasks/`](tasks/)에 있습니다.
 
 남은 것: Vercel 배포와 배포 환경 성능 측정(Task 014), 온디맨드 재검증·태그 필터·OG 이미지(P2).
 
@@ -83,7 +83,7 @@ npm run dev                  # http://localhost:3000
 
 - 시크릿은 헤더로만 받습니다(쿼리 파라미터는 접근 로그에 남음). 틀리면 401, 시크릿이 설정되지 않은 배포에서는 503입니다.
 - 본문 블록만 고친 경우는 속성이 바뀌지 않아 자동화가 발동하지 않습니다. 이때는 60초 ISR을 기다리거나 아무 속성이나 한 번 바꾸세요.
-- 웹훅이 안정적으로 발동하는 것을 확인한 뒤 `revalidate`를 60에서 3600으로 늘려 Notion 호출 횟수를 줄이는 선택지가 남아 있습니다(ROADMAP Task 015 후속).
+- 웹훅이 안정적으로 발동하는 것을 확인한 뒤 `revalidate`를 60에서 3600으로 늘려 Notion 호출 횟수를 줄이는 선택지가 남아 있습니다(ROADMAP v2 Task 021).
 
 ## 프로젝트 구조
 
@@ -125,9 +125,10 @@ npm run dev                  # http://localhost:3000
 │       ├── collect-tags.ts      # 태그 집계 (중복 제거·가나다순)
 │       ├── file-host.ts         # Notion 파일 호스트 (next.config remotePatterns 와 공유)
 │       └── retry.ts             # safeFetch — 예외를 빈 값으로
-├── docs/PRD.md                  # MVP 요구사항
-├── tasks/                       # 작업별 명세·검증 기록
-└── ROADMAP.md                   # 개발 로드맵
+├── docs/
+│   ├── PRD.md                   # MVP 요구사항
+│   └── roadmaps/                # ROADMAP_v1.md(MVP 완료), ROADMAP_v2.md(현행)
+└── tasks/                       # 작업별 명세·검증 기록
 ```
 
 ### 콘텐츠의 단일 출처
