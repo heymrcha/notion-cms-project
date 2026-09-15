@@ -127,16 +127,16 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - ✅ 완료됨(세션 밖): 더미 프로젝트 3건(`Published` 체크, `Order`·`Period Start` 값 분산, 1건 `Period End` 비움, 1건 `External URL` 포함, 본문에 §6.3 7종 블록·인라인 서식·토글 포함) + 미발행 1건 입력 — Task 착수 시 확인만
   - ✅ 완료됨(세션 밖): `.env.local`에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID` 설정(Database ID가 아닌 data source ID임을 확인), `.gitignore`의 `.env*` 반영 확인 — Task 착수 시 확인만
 
-- **Task 009: Notion 클라이언트 및 쿼리·매퍼 구현 (M1)** - 우선순위
+- ✅ **Task 009: Notion 클라이언트 및 쿼리·매퍼 구현 (M1)** - See: /tasks/009-notion-queries-mappers.md
   - `client.ts`: `server-only` + 환경 변수 누락 시 명확한 에러 메시지, `Client` 단일 인스턴스
   - `queries.ts`: `notion.dataSources.query({ data_source_id, filter: Published = true, sorts: [Order desc, Period Start desc] })`; `has_more`/`next_cursor`로 전량 페치; `getProjectBySlug`는 `Slug` equals 필터 + `Published` 필터를 AND로 적용; `getProjectBlocks`는 `blocks.children.list` 전량 페치
-  - `lib/notion/retry.ts`: 429/529(`APIResponseError` 코드 `rate_limited`/`service_overload`) 시 `Retry-After` 헤더 초 존중, 없으면 지수 백오프, 최대 3회. 소진 시 빈 배열/`null` 반환 (throw 금지, 빌드 실패 방지)
+  - 재시도: SDK 5.26 내장 로직(`Client({ retry: { maxRetries: 3 } })` — `Retry-After` 존중, 지수 백오프+지터, 429/529 대상)을 사용. `lib/notion/retry.ts`는 예외를 빈 배열/`null`로 바꾸는 `safeFetch`만 담당 (throw 금지, 빌드 실패 방지). 자체 루프를 겹치면 대기가 곱으로 늘어나 채택하지 않음
   - `mappers.ts`: `isFullPage` 등 SDK 타입 가드 + 속성별 `unknown` 가드로 `Project` 변환. 필수 속성 누락·타입 불일치 행은 `null` 반환 + `console.warn`(페이지 ID·누락 속성명). `Slug` 중복 시 정렬 기준 첫 행 채택 + 경고. `Order` 비면 0
   - 블록 매퍼: §6.3 7종만 `NotionBlock`으로 변환, 그 외는 `null`. rich text 배열의 `annotations`(bold/italic/code)와 `href` 반영
   - `NOTION_API_KEY`가 클라이언트 번들에 없는지 확인(`npm run build` 후 `.next/static` grep)
   - **완료 판정(M1)**: 임시 서버 컴포넌트에서 `getPublishedProjects()` 출력 시 3건이 정렬 규칙대로, 미발행 1건 제외, `npx tsc --noEmit` 통과. Playwright MCP로 화면 출력 확인
 
-- **Task 010: 더미 데이터를 실제 Notion 데이터로 교체 및 에러 처리 연결**
+- **Task 010: 더미 데이터를 실제 Notion 데이터로 교체 및 에러 처리 연결** - 우선순위
   - `app/projects/page.tsx`: Task 004에서 만든 `Project[] | null` 분기(`null` → `ErrorState`, `[]` → `EmptyState`, 404 아님)를 유지한 채 `MOCK_PROJECTS` 대입만 `getPublishedProjects()` 호출로 교체
   - `app/projects/[slug]/page.tsx`: `getProjectBySlug()` → 없거나 미발행이면 `notFound()`, 있으면 `getProjectBlocks()`로 본문 렌더. 페치 예외는 `error.tsx`가 받도록 처리
   - `app/page.tsx`: 최근 3건을 실제 데이터로 교체(실패 시 섹션 숨김)

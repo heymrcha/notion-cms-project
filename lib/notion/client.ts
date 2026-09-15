@@ -1,6 +1,8 @@
 // 클라이언트 번들에 NOTION_API_KEY 가 섞이지 않도록 서버 전용으로 고정한다 (PRD F3)
 import "server-only"
 
+import { Client } from "@notionhq/client"
+
 export const NOTION_ENV_KEYS = [
   "NOTION_API_KEY",
   "NOTION_PROJECTS_DATA_SOURCE_ID",
@@ -18,7 +20,17 @@ export function getNotionEnv(key: NotionEnvKey): string {
   return value
 }
 
-// TODO: @notionhq/client 의 Client 단일 인스턴스 반환 (Task 009, SDK 설치는 Task 008)
-export function getNotionClient(): never {
-  throw new Error("미구현: Task 009 에서 Notion Client 를 생성합니다.")
+let client: Client | null = null
+
+// 모듈 스코프에 한 번만 만들어 요청마다 인스턴스를 새로 만들지 않는다.
+// 429/529 재시도는 SDK 5.x 에 내장돼 있어(Retry-After 존중, 지수 백오프+지터) 따로 감싸지 않는다.
+// 두 겹으로 재시도하면 대기 시간이 곱으로 늘어난다 (PRD §10: 최대 3회).
+export function getNotionClient(): Client {
+  if (!client) {
+    client = new Client({
+      auth: getNotionEnv("NOTION_API_KEY"),
+      retry: { maxRetries: 3 },
+    })
+  }
+  return client
 }
