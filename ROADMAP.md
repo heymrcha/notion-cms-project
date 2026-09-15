@@ -170,14 +170,14 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `notion-blocks.tsx`의 `image` 블록에 `next/image` 적용(`sizes` 지정)
   - Notion 파일 URL 1시간 만료 vs 캐시 60초 관계를 주석으로 남기고, 만료 URL 시나리오를 Playwright MCP로 확인(깨진 이미지가 레이아웃을 무너뜨리지 않음)
 
-- **Task 013: `/about` 페이지 재작성 및 sitemap·robots 생성 (F9·F10)** - 우선순위
+- ✅ **Task 013: `/about` 페이지 재작성 및 sitemap·robots 생성 (F9·F10)** - See: /tasks/013-about-sitemap-robots.md
   - U1 결정 반영: `/about`은 하드코딩. 소개·경력 요약을 모듈 스코프 `UPPER_SNAKE_CASE` 상수로 두고 `.map()` 렌더
   - `SITE_CONFIG`에 `siteUrl` 추가(U3: 도메인 확정 선행, 미확정 시 Vercel 기본 도메인으로 임시)
   - `app/sitemap.ts`: 정적 라우트(`/`, `/projects`, `/about`) + `getPublishedProjects()` 기반 상세 URL, `lastModified` 포함
   - `app/robots.ts`: 전체 허용 + sitemap 경로
   - Playwright MCP로 `/sitemap.xml`, `/robots.txt` 응답 및 `/about` 반응형 확인
 
-- **Task 014: 성능 검증 및 Vercel 배포 (S4·U2)**
+- **Task 014: 성능 검증 및 Vercel 배포 (S4·U2)** - 우선순위
   - U2 확정: Vercel 배포. 환경 변수(`NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID`) 프로젝트 설정에 등록
   - 프로덕션 빌드 기준 Lighthouse 모바일 프리셋으로 `/projects` LCP 2.5초 이내·CLS 0.1 이하 측정(S4), 미달 시 이미지 `priority`/`sizes`·폰트 로딩·카드 수 조정
   - 배포 환경에서 S1~S3 재검증(ISR이 Vercel에서 기대대로 동작하는지)
