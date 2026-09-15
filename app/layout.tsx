@@ -20,8 +20,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // og:image 같은 절대 URL 메타의 기준. 비워 두면 Vercel 이 배포별 URL 을 추측해 프로덕션 도메인이 아닐 수 있다
+  metadataBase: new URL(SITE_CONFIG.siteUrl),
   title: SITE_CONFIG.name,
   description: SITE_CONFIG.description,
+  openGraph: {
+    siteName: SITE_CONFIG.name,
+    locale: "ko_KR",
+    type: "website",
+  },
+  // twitter:image 파일은 따로 두지 않는다 — X 는 없으면 og:image 로 대체한다
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({

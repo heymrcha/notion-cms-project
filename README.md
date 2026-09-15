@@ -37,6 +37,7 @@ npm run dev                  # http://localhost:3000
 |---|---|
 | `NOTION_API_KEY` | Notion 통합(Integration) 시크릿. 서버 전용 |
 | `NOTION_PROJECTS_DATA_SOURCE_ID` | Projects Database의 data source ID |
+| `NOTION_REVALIDATE_SECRET` | (선택) 온디맨드 재검증 시크릿. 비우면 `/api/revalidate`가 503으로 닫힘 |
 
 > 최신 Notion API(`2025-09-03`)는 `databases.query`가 아니라 **`dataSources.query({ data_source_id })`** 를 사용합니다. 웹에 흔한 `database_id` 예제는 구버전이므로 주의하세요. 자세한 근거는 PRD §7.2에 있습니다.
 
@@ -61,8 +62,27 @@ npm run dev                  # http://localhost:3000
 - `Published`를 체크한 행만 사이트에 나옵니다. 초안은 체크를 비워 두면 URL로도 노출되지 않습니다.
 - 본문 최상위 제목은 **제목 1**(`heading_1`)로 시작하세요. 페이지 `<h1>`은 `Title`이 차지하므로 본문 제목이 한 단계씩 내려가며, 제목 2부터 시작하면 접근성 검사에서 heading 건너뜀이 잡힙니다.
 - 지원 블록: 문단, 제목 1~3, 글머리·번호 목록, 인용, 구분선, 코드, 이미지. 토글·표·컬럼 등은 조용히 건너뜁니다.
+- 링크 미리보기(OG 카드)에는 `Title`과 `Outcome`이 크게 들어갑니다. `Title`은 40자, `Outcome`은 48자를 넘기면 말줄임표로 잘립니다.
 - `Order`는 대표작을 위로 올릴 때만 씁니다. 비우면 0으로 취급되고 `Period Start` 최신순으로 정렬됩니다.
-- 수정 후 사이트 반영까지 최대 60초(ISR) 걸립니다.
+- 수정 후 사이트 반영까지 최대 60초(ISR) 걸립니다. 아래 "즉시 반영"을 설정하면 다음 요청부터 바로 반영됩니다.
+
+### 즉시 반영 (선택, Notion 자동화 웹훅)
+
+`POST /api/revalidate`가 `/`, `/projects` 아래 전체(상세·OG 카드 포함), `/sitemap.xml`의 캐시를 무효화합니다. Notion 자동화의 웹훅 액션(유료 플랜)이 이 주소를 호출하게 하면 60초를 기다리지 않아도 됩니다.
+
+1. `openssl rand -hex 32` 등으로 시크릿을 만들어 `.env.local`과 Vercel 환경 변수 `NOTION_REVALIDATE_SECRET`에 넣고 재배포합니다.
+2. Projects Database 우상단 **⚡ 자동화** → 새 자동화 → 트리거: **속성 편집됨**(`Published`, `Title`, `Summary`, `Outcome` 등 사이트에 보이는 속성) 또는 **페이지 추가됨**.
+3. 작업: **웹훅 보내기** → URL `https://notion-cms-project-kohl.vercel.app/api/revalidate` → **커스텀 헤더 추가**: 키 `Authorization`, 값 `Bearer <시크릿>`.
+4. Notion에서 속성을 고친 뒤 사이트를 새로고침하면 바로 반영됩니다. 웹훅 없이 손으로 호출하려면:
+
+   ```bash
+   curl -X POST https://notion-cms-project-kohl.vercel.app/api/revalidate \
+     -H "Authorization: Bearer $NOTION_REVALIDATE_SECRET"
+   ```
+
+- 시크릿은 헤더로만 받습니다(쿼리 파라미터는 접근 로그에 남음). 틀리면 401, 시크릿이 설정되지 않은 배포에서는 503입니다.
+- 본문 블록만 고친 경우는 속성이 바뀌지 않아 자동화가 발동하지 않습니다. 이때는 60초 ISR을 기다리거나 아무 속성이나 한 번 바꾸세요.
+- 웹훅이 안정적으로 발동하는 것을 확인한 뒤 `revalidate`를 60에서 3600으로 늘려 Notion 호출 횟수를 줄이는 선택지가 남아 있습니다(ROADMAP Task 015 후속).
 
 ## 프로젝트 구조
 
@@ -72,10 +92,13 @@ npm run dev                  # http://localhost:3000
 │   ├── layout.tsx               # 루트 레이아웃 (폰트·테마·Navbar·Footer)
 │   ├── page.tsx                 # 홈 — 히어로 + 최근 프로젝트 3건 (ISR 60초)
 │   ├── about/page.tsx           # 소개 — 하드코딩 상수
+│   ├── api/revalidate/route.ts  # 온디맨드 재검증 (POST, Bearer 시크릿)
+│   ├── opengraph-image.tsx      # 사이트 OG 카드 (/projects·/about 이 상속)
 │   ├── projects/
 │   │   ├── page.tsx             # 목록 (ISR 60초, Suspense 스켈레톤)
 │   │   └── [slug]/
 │   │       ├── page.tsx         # 상세 (generateStaticParams + ISR, generateMetadata)
+│   │       ├── opengraph-image.tsx  # Title·Outcome OG 카드 (ISR 60초)
 │   │       ├── error.tsx        # 페치 예외 안내 (유일한 클라이언트 페이지 컴포넌트)
 │   │       └── not-found.tsx    # 404
 │   ├── sitemap.ts               # 정적 + 발행 프로젝트 URL (1시간 재검증)
@@ -88,6 +111,7 @@ npm run dev                  # http://localhost:3000
 ├── lib/
 │   ├── site-config.ts           # 사이트 이름·설명·siteUrl·네비게이션의 단일 출처
 │   ├── format-period.ts         # 기간 표기
+│   ├── og-card.tsx              # OG 카드 레이아웃 (ImageResponse 용, hex 하드코딩 예외)
 │   ├── utils.ts                 # cn()
 │   └── notion/
 │       ├── client.ts            # Notion Client 단일 인스턴스 (server-only, 재시도 3회)
@@ -128,7 +152,7 @@ npx shadcn@latest add [component-name]
 ## 배포 (Vercel)
 
 1. [vercel.com/new](https://vercel.com/new)에서 이 GitHub 저장소를 Import 합니다. 프레임워크는 Next.js로 자동 감지되고 빌드 설정은 기본값 그대로 둡니다.
-2. **Environment Variables**에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID`를 등록합니다(Production·Preview 모두).
+2. **Environment Variables**에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID`를 등록합니다(Production·Preview 모두). 즉시 반영을 쓰려면 `NOTION_REVALIDATE_SECRET`도 함께 등록합니다.
 3. Deploy. 빌드 로그에서 `/projects`·`/projects/[slug]`가 `Revalidate 1m`으로 표시되고 발행된 slug가 프리렌더되면 정상입니다.
 4. 배포 도메인이 정해지면 `lib/site-config.ts`의 `siteUrl`을 그 값으로 바꿉니다. `sitemap.xml`·`robots.txt`가 이 값을 씁니다.
 5. 배포 URL(현재 https://notion-cms-project-kohl.vercel.app)에서 Notion 제목을 수정하고 60초 뒤 새로고침 2회로 반영을 확인합니다(PRD S1~S3).

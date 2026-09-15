@@ -184,20 +184,20 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `README.md`에 Notion 설정 절차(통합 생성·권한 부여·data source ID 확인)와 배포 절차 한국어로 정리
   - 비-Vercel 호스팅 전환 시 §8 재검토 필요 사항을 리스크 절에 유지
 
-- **Task 015: 온디맨드 재검증 Route Handler 구현 (F11, P2)** - 우선순위
+- ✅ **Task 015: 온디맨드 재검증 Route Handler 구현 (F11, P2)** - See: /tasks/015-on-demand-revalidate.md
   - `app/api/revalidate/route.ts`: `NOTION_REVALIDATE_SECRET` 검증 후 `revalidatePath("/projects")`·`revalidatePath("/projects/[slug]", "page")`·`revalidatePath("/")` 호출
   - Notion 자동화(웹훅)에서 호출하도록 설정 절차 문서화, `.env.example`에 시크릿 키 추가
   - `revalidate`를 60 → 3600으로 늘릴지 여부는 웹훅 안정성 확인 후 결정
   - Playwright MCP + 직접 요청으로 잘못된 시크릿 401, 올바른 시크릿 200 및 즉시 반영 확인
 
-- **Task 016: 태그 필터링 구현 (F12, P2 — R4 트리거 시)**
+- **Task 016: 태그 필터링 구현 (F12, P2 — R4 트리거 시)** - 우선순위(착수 조건 충족 시)
   - 착수 조건: 발행 프로젝트 20건 도달(R4). 그 전에는 착수하지 않음
   - URL 검색 파라미터(`?tag=`) 기반 서버 사이드 필터로 클라이언트 훅 없이 구현, 태그 목록은 `Tags` 집계
   - 필터 적용 상태에서도 정렬 규칙·빈 상태 유지
   - Playwright MCP로 필터 선택·해제·직접 URL 접근 확인
 
-- **Task 017: OG 이미지 자동 생성 (F13, P2)**
-  - `app/projects/[slug]/opengraph-image.tsx`로 `Title`·`Outcome` 기반 OG 이미지 생성(Next.js 16 로컬 문서로 API 확인)
+- ✅ **Task 017: OG 이미지 자동 생성 (F13, P2)** - See: /tasks/017-og-image.md
+  - `app/projects/[slug]/opengraph-image.tsx`로 `Title`·`Outcome` 기반 OG 이미지 생성(Next.js 16 로컬 문서로 API 확인). 루트 `app/opengraph-image.tsx` 사이트 카드 추가. `generateStaticParams` 가 있어야 ISR 로 캐시됨, 온디맨드 무효화는 `/projects` layout 타입으로 변경
   - `generateMetadata`에 `openGraph`·`twitter` 메타 연결
   - Playwright MCP로 `/projects/[slug]/opengraph-image` 응답 및 메타 태그 확인
 
@@ -213,7 +213,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 | U2 | 배포 대상을 Vercel로 가정 | Task 014(확정) | **확정: Vercel**. https://notion-cms-project-kohl.vercel.app — S1~S4 배포 환경 검증 완료. 다른 호스팅이면 PRD §8 재검토(README 참고) |
 | U3 | 도메인 연결 여부·주소 미정 | Task 013, 014(확정) | Vercel 기본 도메인 `notion-cms-project-kohl.vercel.app`으로 확정, `SITE_CONFIG.siteUrl` 반영. 커스텀 도메인 연결 시 이 값만 교체 |
 | R5 | `loading.tsx`가 있으면 응답이 스트리밍되어 `notFound()`가 HTTP 404 대신 200 + `noindex` 메타로 내려감(Next 문서 `loading.md` §Status Codes) | Task 005(결정 완료), 012 | **결정: 두 `loading.tsx` 삭제**(Task 005). 개발·프로덕션·ISR 모두 404 확인. Task 012 스켈레톤은 `loading.tsx` 대신 페이지 내부 `<Suspense>`로 본문만 감싸고, `notFound()` 존재 확인은 Suspense 밖(스트리밍 전)에서 수행 |
-| R6 | 404였던 상세 엔트리가 재발행 후 처음 재생성될 때 본문은 정상이나 `<title>` 기본값 + `noindex`가 한 주기(≤60초) 남음. 다음 재검증에서 자동 복구됨(Task 011 실측, Task 011-1의 S1 경로 — 발행 전 404가 캐시된 신규 slug — 에서도 재현) | Task 011·011-1(관찰), 015 | 재발행이 드물고 창이 60초라 MVP는 수용. Task 015에서 `revalidatePath` 경로로도 재현되는지 확인하고, 재현 시 Next.js 이슈 검색·보고 |
+| R6 | 404였던 상세 엔트리가 재발행 후 처음 재생성될 때 본문은 정상이나 `<title>` 기본값 + `noindex`가 한 주기(≤60초) 남음. 다음 재검증에서 자동 복구됨(Task 011 실측, Task 011-1의 S1 경로 — 발행 전 404가 캐시된 신규 slug — 에서도 재현) | Task 011·011-1(관찰), 015(확인) | 재발행이 드물고 창이 60초라 MVP는 수용. **Task 015 실측: `revalidatePath` 경로에서는 재현되지 않음** — 404 캐시 후 재발행 → POST → 첫 응답부터 정상 `<title>`, `noindex` 없음. 시간 기반 재검증(백그라운드 재생성)에서만 발생하므로 재발행 직후 웹훅·수동 POST로 우회 가능 |
 
 ## Phase 간 병렬 작업 가능성
 

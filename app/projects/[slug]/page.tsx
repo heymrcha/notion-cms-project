@@ -31,9 +31,24 @@ export async function generateMetadata({
   const { slug } = await params
   const project = await getProjectBySlug(slug)
   if (!project) return { title: `프로젝트를 찾을 수 없습니다 | ${SITE_CONFIG.name}` }
+  // og:image 는 같은 세그먼트의 opengraph-image.tsx 가 자동으로 붙이므로 여기서 images 를 지정하지 않는다
   return {
     title: `${project.title} | ${SITE_CONFIG.name}`,
     description: project.summary,
+    // openGraph 객체는 루트 layout 의 값과 병합되지 않고 통째로 대체되므로 siteName·locale 을 다시 적는다
+    openGraph: {
+      title: project.title,
+      description: project.summary,
+      siteName: SITE_CONFIG.name,
+      locale: "ko_KR",
+      type: "article",
+      url: `/projects/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.summary,
+    },
   }
 }
 
