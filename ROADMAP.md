@@ -86,7 +86,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 2: UI/UX 완성 (더미 데이터 활용)
 
-- **Task 004: 프로젝트 카드 및 목록 그리드 UI 구현** - 우선순위
+- ✅ **Task 004: 프로젝트 카드 및 목록 그리드 UI 구현** - See: /tasks/004-project-card-grid.md
   - `project-card.tsx`: shadcn `card` + `badge`로 제목·`Outcome`·기간(`Period End` 없으면 "진행 중")·`Tags` 배지 렌더. 제목 `<Link>`에 접근 가능한 이름 부여(카드 전체 링크 금지, §10 접근성)
   - 기간 포맷 유틸 `lib/format-period.ts`(ISO → `2025.03 – 2025.08` / `2025.03 – 진행 중`)
   - `project-grid.tsx`: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
@@ -94,12 +94,12 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `empty-state.tsx`("아직 발행된 프로젝트가 없습니다"), `error-state.tsx`("프로젝트를 불러오지 못했습니다") 완성 및 목록 페이지에서 조건부 렌더 경로 확보
   - Playwright MCP로 375/768/1280에서 열 수·가로 스크롤 없음·다크 모드 대비 확인
 
-- **Task 005: 프로젝트 상세 상단 메타 UI 구현**
+- **Task 005: 프로젝트 상세 상단 메타 UI 구현** - 우선순위
   - `project-header.tsx`: `<h1>` 제목, `Outcome` 강조 문구, `Role`, 기간, `Tags` 배지
   - `External URL` 있을 때만 하단에 shadcn `button` 링크(`target="_blank" rel="noreferrer"`) 렌더
   - `Cover` 자리는 고정 비율 컨테이너(`aspect-video`)만 확보(이미지 자체는 Phase 4 F8)
   - `app/projects/[slug]/page.tsx`에 더미 연결, 더미에 없는 slug는 `notFound()` 호출
-  - `not-found.tsx`: "프로젝트를 찾을 수 없습니다" + `/projects` 복귀 링크. `error.tsx`: 안내 문구 + `reset` 버튼
+  - `not-found.tsx`: "프로젝트를 찾을 수 없습니다" + `/projects` 복귀 링크. `error.tsx`: 안내 문구 + `retry` 버튼(Next.js 16.3.4 로컬 문서 기준 prop 이름은 `reset`이 아니라 `retry`이며, Task 001에서 이미 `retry` 시그니처로 작성됨)
   - Playwright MCP로 목록 → 상세 → 외부 링크 → 뒤로 가기 흐름과 404 렌더 확인
 
 - **Task 006: Notion 블록 렌더러 구현**
@@ -112,7 +112,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 - **Task 007: 홈 히어로 및 최근 프로젝트 3건 섹션 구현**
   - `app/page.tsx` 히어로: 포트폴리오 소개 문구(`SITE_CONFIG.name`/`description` 참조) + `/projects` CTA 버튼
-  - "최근 프로젝트" 섹션: 정렬 규칙 상위 3건을 `project-card.tsx` 재사용으로 렌더 + "전체 보기" 링크(더미 데이터)
+  - "최근 프로젝트" 섹션: Task 004의 `sortProjects`(`lib/notion/sort-projects.ts`)로 정렬한 상위 3건을 `project-card.tsx` 재사용으로 렌더 + "전체 보기" 링크(더미 데이터)
   - 0건이면 섹션 자체를 숨김(홈은 빈 상태 문구를 띄우지 않음)
   - F5 완료 항목 최종 점검: ✅ `SITE_CONFIG` 교체 / ✅ `/docs` 제거 / ✅ `v1.0.0` 배지 제거 / 히어로 + 최근 3건(이 Task에서 완료)
   - Playwright MCP로 375/1280 반응형 및 다크 모드 확인
@@ -122,9 +122,10 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 - **Task 008: Notion Database 준비 및 SDK 설치 (M1 선행)**
   - `npm i @notionhq/client` 설치 후 **설치된 버전의 타입 정의를 먼저 확인**(R1: `dataSources.query`가 존재하는지, `databases.query`는 쓰지 않음)
   - Context7로 `@notionhq/client` 최신 문서(`dataSources.query`, `blocks.children.list`, 페이지네이션, 에러 코드) 조회
-  - Notion 통합(Integration) 생성, Projects Database를 §6.1 스키마(12개 속성)로 생성, 통합에 연결 권한 부여
-  - 더미 프로젝트 3건(`Published` 체크, `Order`·`Period Start`가 정렬 검증에 유효하도록 값 분산, 1건은 `Period End` 비움, 1건은 `External URL` 포함) + 미발행 1건 입력. 본문에 §6.3 7종 블록·인라인 서식·미지원 블록(토글 등) 포함
-  - `.env.local`에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID` 설정(data source ID 확인 방법 기록), `.gitignore` 반영 확인
+  - Projects Database 페이지에 통합(Integration) 연결 권한 부여(사용자 수작업). 미완료 시 API가 `object_not_found`를 반환하므로 Task 009 착수 전 반드시 확인
+  - ✅ 완료됨(세션 밖): Notion 통합 생성 및 API 키 발급, Projects Database를 §6.1 스키마(12개 속성)로 생성(Notion MCP 사용) — Task 착수 시 확인만
+  - ✅ 완료됨(세션 밖): 더미 프로젝트 3건(`Published` 체크, `Order`·`Period Start` 값 분산, 1건 `Period End` 비움, 1건 `External URL` 포함, 본문에 §6.3 7종 블록·인라인 서식·토글 포함) + 미발행 1건 입력 — Task 착수 시 확인만
+  - ✅ 완료됨(세션 밖): `.env.local`에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID` 설정(Database ID가 아닌 data source ID임을 확인), `.gitignore`의 `.env*` 반영 확인 — Task 착수 시 확인만
 
 - **Task 009: Notion 클라이언트 및 쿼리·매퍼 구현 (M1)**
   - `client.ts`: `server-only` + 환경 변수 누락 시 명확한 에러 메시지, `Client` 단일 인스턴스
@@ -136,7 +137,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - **완료 판정(M1)**: 임시 서버 컴포넌트에서 `getPublishedProjects()` 출력 시 3건이 정렬 규칙대로, 미발행 1건 제외, `npx tsc --noEmit` 통과. Playwright MCP로 화면 출력 확인
 
 - **Task 010: 더미 데이터를 실제 Notion 데이터로 교체 및 에러 처리 연결**
-  - `app/projects/page.tsx`: `getPublishedProjects()` 연결, 실패(`null`) 시 `error-state`, 0건 시 `empty-state`(404 아님)
+  - `app/projects/page.tsx`: Task 004에서 만든 `Project[] | null` 분기(`null` → `ErrorState`, `[]` → `EmptyState`, 404 아님)를 유지한 채 `MOCK_PROJECTS` 대입만 `getPublishedProjects()` 호출로 교체
   - `app/projects/[slug]/page.tsx`: `getProjectBySlug()` → 없거나 미발행이면 `notFound()`, 있으면 `getProjectBlocks()`로 본문 렌더. 페치 예외는 `error.tsx`가 받도록 처리
   - `app/page.tsx`: 최근 3건을 실제 데이터로 교체(실패 시 섹션 숨김)
   - `lib/notion/mock-data.ts` 삭제 및 참조 제거
