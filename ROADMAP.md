@@ -163,14 +163,14 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 
 ### Phase 4: 고급 기능 및 최적화
 
-- **Task 012: 로딩 스켈레톤 및 Cover 이미지 적용 (F7·F8)** - 우선순위
+- ✅ **Task 012: 로딩 스켈레톤 및 Cover 이미지 적용 (F7·F8)** - See: /tasks/012-skeleton-cover-image.md
   - 스켈레톤은 `loading.tsx`가 아니라 **페이지 내부 `<Suspense>`** 로 구현(R5: `loading.tsx`는 `notFound()`의 404를 막음). 상세는 `getProjectBySlug` → `notFound()`를 Suspense 밖에서 끝낸 뒤 본문(`getProjectBlocks`)만 Suspense로 감싸 스켈레톤(`animate-pulse`, 토큰 색) 노출. CLS 방지를 위해 실제 레이아웃과 동일한 치수
   - R2 해소: Next.js 16 로컬 문서(`node_modules/next/dist/docs/`)로 `images.remotePatterns` 스키마 확인, 실제 Notion 파일 URL 호스트·경로 패턴을 API 응답에서 채취해 `next.config.ts`에 등록
   - `project-card.tsx`·`project-header.tsx`에 `next/image` 적용, `alt`는 `Title`, 고정 비율 컨테이너 유지(이미지 실패 시 레이아웃 불변)
   - `notion-blocks.tsx`의 `image` 블록에 `next/image` 적용(`sizes` 지정)
   - Notion 파일 URL 1시간 만료 vs 캐시 60초 관계를 주석으로 남기고, 만료 URL 시나리오를 Playwright MCP로 확인(깨진 이미지가 레이아웃을 무너뜨리지 않음)
 
-- **Task 013: `/about` 페이지 재작성 및 sitemap·robots 생성 (F9·F10)**
+- **Task 013: `/about` 페이지 재작성 및 sitemap·robots 생성 (F9·F10)** - 우선순위
   - U1 결정 반영: `/about`은 하드코딩. 소개·경력 요약을 모듈 스코프 `UPPER_SNAKE_CASE` 상수로 두고 `.map()` 렌더
   - `SITE_CONFIG`에 `siteUrl` 추가(U3: 도메인 확정 선행, 미확정 시 Vercel 기본 도메인으로 임시)
   - `app/sitemap.ts`: 정적 라우트(`/`, `/projects`, `/about`) + `getPublishedProjects()` 기반 상세 URL, `lastModified` 포함
@@ -206,7 +206,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 | ID | 내용 | 반영 위치 | 대응 |
 |---|---|---|---|
 | R1 | Notion API `databases` → `data sources` 전환 직후라 웹 예제·SDK 타입 세대가 섞여 있음 | Task 008, 009 | 설치된 `@notionhq/client` 타입 정의와 Context7 문서를 먼저 확인. `dataSources.query({ data_source_id })`만 사용, `databases.query` 금지 |
-| R2 | `images.remotePatterns` 스키마와 Notion S3 URL 호스트·경로 패턴 미검증 | Task 012 | F8 착수 시 Next.js 16 로컬 문서 재확인. MVP(P0)는 `Cover` 없이 성립 |
+| R2 | `images.remotePatterns` 스키마와 Notion S3 URL 호스트·경로 패턴 미검증 | Task 012(해소) | **해소**: 호스트 `prod-files-secure.s3.us-west-2.amazonaws.com`, 경로 `/<워크스페이스 ID>/<파일 ID>/<파일명>`, 서명 쿼리 → `search` 생략. `lib/notion/file-host.ts` 참조 |
 | R3 | 빌드 시 Notion 실패로 `generateStaticParams`가 빈 배열을 반환할 수 있음 | Task 009, 011 | 페치 계층이 throw하지 않고 빈 값 반환, `dynamicParams` 기본값 유지로 런타임 생성 |
 | R4 | 프로젝트 20건 초과 시 필터·페이지네이션 부재가 실제 문제 | Task 016 | 20건 도달 시 F12 착수 재평가 |
 | U1 | `/about` 경력 정보의 출처(Notion vs 하드코딩) | Task 013 | MVP는 하드코딩으로 확정. 갱신 빈도가 낮아 CMS화 이득이 작음 |

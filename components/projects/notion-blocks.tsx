@@ -1,5 +1,6 @@
 import { groupBlocks, type GroupedBlock } from "@/lib/notion/group-blocks"
 import type { NotionBlock } from "@/lib/notion/types"
+import { CoverImage } from "./cover-image"
 import { RichTextSpans } from "./rich-text"
 
 type NotionBlocksProps = {
@@ -65,11 +66,7 @@ function renderBlock(block: GroupedBlock) {
     case "image":
       return (
         <figure key={block.id} className="my-6">
-          {/* TODO(Task 012): next/image 적용. 지금은 비율만 고정해 레이아웃 흔들림을 막는다 */}
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={block.url} alt={block.alt} className="size-full object-cover" />
-          </div>
+          <CoverImage src={block.url} alt={block.alt} sizes="(max-width: 768px) 100vw, 48rem" />
         </figure>
       )
     case "divider":

@@ -1,8 +1,10 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 import { EmptyState } from "@/components/projects/empty-state"
 import { ErrorState } from "@/components/projects/error-state"
 import { ProjectGrid } from "@/components/projects/project-grid"
+import { ProjectGridSkeleton } from "@/components/projects/project-grid-skeleton"
 import { getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
 
@@ -14,21 +16,23 @@ export const metadata: Metadata = {
 // 방문자 요청이 Notion 을 직접 치지 않도록 정적 생성하고, PRD 가 요구한 "1분 이내 반영"에 맞춰 60초마다 재검증한다 (PRD §8)
 export const revalidate = 60
 
-export default async function ProjectsPage() {
-  // 정렬은 Notion 쿼리(Order desc → Period Start desc)가 이미 끝냈다
+// 페치를 자식으로 내려 제목은 즉시 내려보내고 그리드만 스트리밍한다. loading.tsx 대신 페이지 안 Suspense 를
+// 쓰는 이유는 R5 — 라우트 단위 로딩 경계는 notFound() 의 404 를 200 으로 바꾼다
+async function ProjectList() {
   const projects = await getPublishedProjects()
+  if (projects === null) return <ErrorState />
+  if (projects.length === 0) return <EmptyState />
+  return <ProjectGrid projects={projects} />
+}
 
+export default function ProjectsPage() {
   return (
     <div className="container mx-auto max-w-screen-2xl px-4 py-16">
       <div className="space-y-8">
         <h1 className="text-4xl font-bold tracking-tight">프로젝트</h1>
-        {projects === null ? (
-          <ErrorState />
-        ) : projects.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <ProjectGrid projects={projects} />
-        )}
+        <Suspense fallback={<ProjectGridSkeleton />}>
+          <ProjectList />
+        </Suspense>
       </div>
     </div>
   )

@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import { Suspense } from "react"
 
 import { NotionBlocks } from "@/components/projects/notion-blocks"
+import { NotionBlocksSkeleton } from "@/components/projects/notion-blocks-skeleton"
 import { ProjectHeader } from "@/components/projects/project-header"
 import { getProjectBlocks, getProjectBySlug, getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
@@ -35,21 +37,27 @@ export async function generateMetadata({
   }
 }
 
+async function ProjectBody({ pageId }: { pageId: string }) {
+  const blocks = await getProjectBlocks(pageId)
+  return <NotionBlocks blocks={blocks} />
+}
+
 export default async function ProjectDetailPage({ params }: ProjectDetailPageProps) {
   // Next.js 16 에서 params 는 Promise 이므로 await 가 필요하다
   const { slug } = await params
 
   // 미발행·없는 slug 모두 null → 404. 페치 실패도 null 이라 초안이 새지 않는 쪽으로 기운다 (PRD §11)
+  // 존재 확인은 반드시 Suspense 밖에서 끝낸다 — 스트리밍이 시작된 뒤의 notFound() 는 200 으로 내려간다 (R5)
   const project = await getProjectBySlug(slug)
   if (!project) notFound()
-
-  const blocks = await getProjectBlocks(project.id)
 
   return (
     <div className="container mx-auto max-w-screen-2xl px-4 py-16">
       <div className="mx-auto max-w-3xl space-y-12">
         <ProjectHeader project={project} />
-        <NotionBlocks blocks={blocks} />
+        <Suspense fallback={<NotionBlocksSkeleton />}>
+          <ProjectBody pageId={project.id} />
+        </Suspense>
       </div>
     </div>
   )

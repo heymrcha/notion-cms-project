@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatPeriod } from "@/lib/format-period"
+import { CoverImage } from "./cover-image"
 import type { Project } from "@/lib/notion/types"
 
 type ProjectHeaderProps = {
@@ -10,13 +11,15 @@ type ProjectHeaderProps = {
 }
 
 export function ProjectHeader({ project }: ProjectHeaderProps) {
-  const { title, outcome, role, periodStart, periodEnd, tags, externalUrl } =
+  const { title, outcome, role, periodStart, periodEnd, tags, externalUrl, coverUrl } =
     project
 
   return (
     <header className="space-y-6">
-      {/* TODO(Task 012): Cover 이미지 — 지금은 비율만 확보 */}
-      <div className="aspect-video w-full rounded-xl bg-muted" />
+      {/* 헤더 커버는 첫 화면의 LCP 후보이므로 priority 로 프리로드한다. 본문 폭(max-w-3xl=48rem)이 상한 */}
+      {coverUrl && (
+        <CoverImage src={coverUrl} alt={title} sizes="(max-width: 768px) 100vw, 48rem" priority />
+      )}
       <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
       <p className="text-lg font-medium text-foreground">{outcome}</p>
       <dl className="flex flex-col gap-4 sm:flex-row sm:gap-8">
