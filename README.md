@@ -61,6 +61,7 @@ npm run dev                  # http://localhost:3000
 
 - `Published`를 체크한 행만 사이트에 나옵니다. 초안은 체크를 비워 두면 URL로도 노출되지 않습니다.
 - 본문 최상위 제목은 **제목 1**(`heading_1`)로 시작하세요. 페이지 `<h1>`은 `Title`이 차지하므로 본문 제목이 한 단계씩 내려가며, 제목 2부터 시작하면 접근성 검사에서 heading 건너뜀이 잡힙니다.
+- `Tags`는 목록 상단의 필터 칩과 `/projects/tag/<태그>` 페이지가 됩니다. 태그 이름을 바꾸면 URL도 바뀝니다.
 - 지원 블록: 문단, 제목 1~3, 글머리·번호 목록, 인용, 구분선, 코드, 이미지. 토글·표·컬럼 등은 조용히 건너뜁니다.
 - 링크 미리보기(OG 카드)에는 `Title`과 `Outcome`이 크게 들어갑니다. `Title`은 40자, `Outcome`은 48자를 넘기면 말줄임표로 잘립니다.
 - `Order`는 대표작을 위로 올릴 때만 씁니다. 비우면 0으로 취급되고 `Period Start` 최신순으로 정렬됩니다.
@@ -95,7 +96,8 @@ npm run dev                  # http://localhost:3000
 │   ├── api/revalidate/route.ts  # 온디맨드 재검증 (POST, Bearer 시크릿)
 │   ├── opengraph-image.tsx      # 사이트 OG 카드 (/projects·/about 이 상속)
 │   ├── projects/
-│   │   ├── page.tsx             # 목록 (ISR 60초, Suspense 스켈레톤)
+│   │   ├── page.tsx             # 목록 (ISR 60초, Suspense 스켈레톤, 태그 칩)
+│   │   ├── tag/[tag]/page.tsx   # 태그별 목록 (경로 세그먼트 — ?tag= 는 ISR 을 풀어서 채택 안 함)
 │   │   └── [slug]/
 │   │       ├── page.tsx         # 상세 (generateStaticParams + ISR, generateMetadata)
 │   │       ├── opengraph-image.tsx  # Title·Outcome OG 카드 (ISR 60초)
@@ -120,6 +122,7 @@ npm run dev                  # http://localhost:3000
 │       ├── types.ts             # 앱 전용 타입
 │       ├── sort-projects.ts     # Order desc → Period Start desc
 │       ├── group-blocks.ts      # 연속 리스트 항목 묶기
+│       ├── collect-tags.ts      # 태그 집계 (중복 제거·가나다순)
 │       ├── file-host.ts         # Notion 파일 호스트 (next.config remotePatterns 와 공유)
 │       └── retry.ts             # safeFetch — 예외를 빈 값으로
 ├── docs/PRD.md                  # MVP 요구사항

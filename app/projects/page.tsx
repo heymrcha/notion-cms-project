@@ -5,6 +5,8 @@ import { EmptyState } from "@/components/projects/empty-state"
 import { ErrorState } from "@/components/projects/error-state"
 import { ProjectGrid } from "@/components/projects/project-grid"
 import { ProjectGridSkeleton } from "@/components/projects/project-grid-skeleton"
+import { TagFilter } from "@/components/projects/tag-filter"
+import { collectTags } from "@/lib/notion/collect-tags"
 import { getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
 
@@ -22,7 +24,12 @@ async function ProjectList() {
   const projects = await getPublishedProjects()
   if (projects === null) return <ErrorState />
   if (projects.length === 0) return <EmptyState />
-  return <ProjectGrid projects={projects} />
+  return (
+    <>
+      <TagFilter tags={collectTags(projects)} currentTag={null} />
+      <ProjectGrid projects={projects} />
+    </>
+  )
 }
 
 export default function ProjectsPage() {
@@ -31,7 +38,9 @@ export default function ProjectsPage() {
       <div className="space-y-8">
         <h1 className="text-4xl font-bold tracking-tight">프로젝트</h1>
         <Suspense fallback={<ProjectGridSkeleton />}>
-          <ProjectList />
+          <div className="space-y-8">
+            <ProjectList />
+          </div>
         </Suspense>
       </div>
     </div>

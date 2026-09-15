@@ -1,10 +1,14 @@
 import { cn } from "@/lib/utils"
 
 type EmptyStateProps = {
+  message?: string
   className?: string
 }
 
-export function EmptyState({ className }: EmptyStateProps) {
+export function EmptyState({
+  message = "아직 발행된 프로젝트가 없습니다.",
+  className,
+}: EmptyStateProps) {
   return (
     <div
       role="status"
@@ -13,7 +17,7 @@ export function EmptyState({ className }: EmptyStateProps) {
         className
       )}
     >
-      아직 발행된 프로젝트가 없습니다.
+      {message}
     </div>
   )
 }

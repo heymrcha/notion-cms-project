@@ -190,9 +190,9 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
   - `revalidate`를 60 → 3600으로 늘릴지 여부는 웹훅 안정성 확인 후 결정
   - Playwright MCP + 직접 요청으로 잘못된 시크릿 401, 올바른 시크릿 200 및 즉시 반영 확인
 
-- **Task 016: 태그 필터링 구현 (F12, P2 — R4 트리거 시)** - 우선순위(착수 조건 충족 시)
-  - 착수 조건: 발행 프로젝트 20건 도달(R4). 그 전에는 착수하지 않음
-  - URL 검색 파라미터(`?tag=`) 기반 서버 사이드 필터로 클라이언트 훅 없이 구현, 태그 목록은 `Tags` 집계
+- ✅ **Task 016: 태그 필터링 구현 (F12, P2 — R4 트리거 시)** - See: /tasks/016-tag-filter.md
+  - 착수 조건은 발행 20건(R4)이었으나 사용자 지시로 3건 시점에 착수(2026-09-15)
+  - ~~URL 검색 파라미터(`?tag=`)~~ → **`/projects/tag/[tag]` 경로 세그먼트**로 구현(`searchParams`는 Request-time API라 ISR이 풀려 PRD §8과 충돌). `generateStaticParams` + `revalidate = 60`, 태그 목록은 `Tags` 집계
   - 필터 적용 상태에서도 정렬 규칙·빈 상태 유지
   - Playwright MCP로 필터 선택·해제·직접 URL 접근 확인
 
@@ -208,7 +208,7 @@ Notion CMS PM 포트폴리오는 채용 담당자를 위한 읽기 전용 프로
 | R1 | Notion API `databases` → `data sources` 전환 직후라 웹 예제·SDK 타입 세대가 섞여 있음 | Task 008, 009 | 설치된 `@notionhq/client` 타입 정의와 Context7 문서를 먼저 확인. `dataSources.query({ data_source_id })`만 사용, `databases.query` 금지 |
 | R2 | `images.remotePatterns` 스키마와 Notion S3 URL 호스트·경로 패턴 미검증 | Task 012(해소) | **해소**: 호스트 `prod-files-secure.s3.us-west-2.amazonaws.com`, 경로 `/<워크스페이스 ID>/<파일 ID>/<파일명>`, 서명 쿼리 → `search` 생략. `lib/notion/file-host.ts` 참조 |
 | R3 | 빌드 시 Notion 실패로 `generateStaticParams`가 빈 배열을 반환할 수 있음 | Task 009, 011 | 페치 계층이 throw하지 않고 빈 값 반환, `dynamicParams` 기본값 유지로 런타임 생성 |
-| R4 | 프로젝트 20건 초과 시 필터·페이지네이션 부재가 실제 문제 | Task 016 | 20건 도달 시 F12 착수 재평가 |
+| R4 | 프로젝트 20건 초과 시 필터·페이지네이션 부재가 실제 문제 | Task 016(필터 완료) | 태그 필터는 Task 016으로 선반영. 페이지네이션은 20건 도달 시 재평가 |
 | U1 | `/about` 경력 정보의 출처(Notion vs 하드코딩) | Task 013 | MVP는 하드코딩으로 확정. 갱신 빈도가 낮아 CMS화 이득이 작음 |
 | U2 | 배포 대상을 Vercel로 가정 | Task 014(확정) | **확정: Vercel**. https://notion-cms-project-kohl.vercel.app — S1~S4 배포 환경 검증 완료. 다른 호스팅이면 PRD §8 재검토(README 참고) |
 | U3 | 도메인 연결 여부·주소 미정 | Task 013, 014(확정) | Vercel 기본 도메인 `notion-cms-project-kohl.vercel.app`으로 확정, `SITE_CONFIG.siteUrl` 반영. 커스텀 도메인 연결 시 이 값만 교체 |

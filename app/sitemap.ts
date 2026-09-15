@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next"
 
+import { tagHref } from "@/components/projects/tag-filter"
+import { collectTags } from "@/lib/notion/collect-tags"
 import { getPublishedProjects } from "@/lib/notion/queries"
 import { SITE_CONFIG } from "@/lib/site-config"
 
@@ -24,5 +26,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticRoutes, ...projectRoutes]
+  const tagRoutes: MetadataRoute.Sitemap = collectTags(projects).map((tag) => ({
+    url: `${SITE_CONFIG.siteUrl}${tagHref(tag)}`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }))
+
+  return [...staticRoutes, ...projectRoutes, ...tagRoutes]
 }
