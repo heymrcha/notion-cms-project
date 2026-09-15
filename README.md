@@ -6,13 +6,9 @@ Notion을 CMS로 사용하는 개인 포트폴리오 웹사이트입니다. 프�
 
 ## 현재 상태
 
-**기획 단계입니다.** MVP 요구사항은 [`docs/PRD.md`](docs/PRD.md)에 정의되어 있고, Notion 연동 구현은 아직 시작하지 않았습니다. 저장소에는 Next.js 스타터 킷의 레이아웃 셸(Navbar / Footer / 다크 모드), 정적 페이지 2개(`/`, `/about`), 그리고 `/projects`·`/projects/[slug]` 라우트 골격(자리표시 문구만, Phase 2에서 UI 구현)이 있습니다.
+**MVP 구현 완료, 배포 단계입니다.** Notion Database 연동(`lib/notion/*`), 프로젝트 목록·상세 화면, Notion 블록 렌더러, ISR(60초 재검증), 스켈레톤·이미지 최적화, `/about`, `sitemap.xml`·`robots.txt`까지 구현되어 있습니다. 진행 상황은 [`ROADMAP.md`](ROADMAP.md), 요구사항은 [`docs/PRD.md`](docs/PRD.md), 작업별 기록은 [`tasks/`](tasks/)에 있습니다.
 
-구현 순서는 PRD의 마일스톤을 따릅니다.
-
-1. **M1 데이터 계층** — Notion Database 생성, `lib/notion/*` 페치·매핑 계층
-2. **M2 화면** — `/projects` 목록, `/projects/[slug]` 상세, 블록 렌더러
-3. **M3 셸 정리 + ISR** — `SITE_CONFIG` 교체, `revalidate` 적용
+남은 것: Vercel 배포와 배포 환경 성능 측정(Task 014), 온디맨드 재검증·태그 필터·OG 이미지(P2).
 
 ## 기술 스택
 
@@ -23,7 +19,7 @@ Notion을 CMS로 사용하는 개인 포트폴리오 웹사이트입니다. 프�
 - **[shadcn/ui](https://ui.shadcn.com)** + [Radix UI](https://www.radix-ui.com)
 - **[Lucide React](https://lucide.dev)** — 아이콘
 - **[next-themes](https://github.com/pacocoursey/next-themes)** — 클래스 기반 다크 모드
-- **[Notion API](https://developers.notion.com)** — 콘텐츠 소스 (도입 예정)
+- **[Notion API](https://developers.notion.com)** — 콘텐츠 소스. `@notionhq/client` 5.x, API 버전 `2025-09-03`
 
 ## 빠른 시작
 
@@ -44,26 +40,67 @@ npm run dev                  # http://localhost:3000
 
 > 최신 Notion API(`2025-09-03`)는 `databases.query`가 아니라 **`dataSources.query({ data_source_id })`** 를 사용합니다. 웹에 흔한 `database_id` 예제는 구버전이므로 주의하세요. 자세한 근거는 PRD §7.2에 있습니다.
 
-Notion 쪽에서는 통합을 생성한 뒤, 대상 Database 페이지에 그 통합의 연결 권한을 부여해야 합니다. 권한이 없으면 API가 Database를 찾지 못합니다.
+### Notion 설정 절차
+
+1. **통합 생성** — [notion.so/my-integrations](https://www.notion.so/my-integrations)에서 내부 통합(Internal Integration)을 만들고 시크릿을 복사해 `NOTION_API_KEY`에 넣습니다. 권한은 "콘텐츠 읽기"만 있으면 됩니다.
+2. **Database 생성** — PRD §6.1 스키마(속성 12개: `Title`, `Slug`, `Published`, `Summary`, `Outcome`, `Role`, `Period Start`, `Period End`, `Tags`, `Cover`, `External URL`, `Order`)로 Projects Database를 만듭니다. 속성 이름은 코드가 그대로 읽으므로 정확히 맞춰야 합니다.
+3. **통합 연결** — Database 페이지 우상단 `···` → **연결** → 1번에서 만든 통합을 추가합니다. 이 단계를 빼먹으면 API가 `object_not_found`를 돌려줍니다.
+4. **data source ID 확인** — Database ID가 아니라 **data source ID**가 필요합니다. 아래 명령으로 Database에 속한 data source를 조회할 수 있습니다(`<database_id>`는 Database URL의 32자리 ID).
+
+   ```bash
+   curl -s https://api.notion.com/v1/databases/<database_id> \
+     -H "Authorization: Bearer $NOTION_API_KEY" \
+     -H "Notion-Version: 2025-09-03" | jq '.data_sources[].id'
+   ```
+
+   출력된 ID를 `NOTION_PROJECTS_DATA_SOURCE_ID`에 넣습니다.
+5. **확인** — `npm run dev` 후 `/projects`에 `Published` 체크된 행이 보이면 끝입니다. 오류 안내가 보이면 서버 로그의 `[notion] … 실패 — <code>` 줄에서 원인(`unauthorized`: 키 오류, `object_not_found`: 연결 권한 또는 ID 오류)을 확인하세요.
+
+### 콘텐츠 작성 규칙
+
+- `Published`를 체크한 행만 사이트에 나옵니다. 초안은 체크를 비워 두면 URL로도 노출되지 않습니다.
+- 본문 최상위 제목은 **제목 1**(`heading_1`)로 시작하세요. 페이지 `<h1>`은 `Title`이 차지하므로 본문 제목이 한 단계씩 내려가며, 제목 2부터 시작하면 접근성 검사에서 heading 건너뜀이 잡힙니다.
+- 지원 블록: 문단, 제목 1~3, 글머리·번호 목록, 인용, 구분선, 코드, 이미지. 토글·표·컬럼 등은 조용히 건너뜁니다.
+- `Order`는 대표작을 위로 올릴 때만 씁니다. 비우면 0으로 취급되고 `Period Start` 최신순으로 정렬됩니다.
+- 수정 후 사이트 반영까지 최대 60초(ISR) 걸립니다.
 
 ## 프로젝트 구조
 
 ```
-├── app/                    # App Router
-│   ├── globals.css        # Tailwind 설정 전체 (@theme inline / :root / .dark)
-│   ├── layout.tsx         # 루트 레이아웃
-│   └── page.tsx           # 홈
+├── app/
+│   ├── globals.css              # Tailwind 설정 전체 (@theme inline / :root / .dark)
+│   ├── layout.tsx               # 루트 레이아웃 (폰트·테마·Navbar·Footer)
+│   ├── page.tsx                 # 홈 — 히어로 + 최근 프로젝트 3건 (ISR 60초)
+│   ├── about/page.tsx           # 소개 — 하드코딩 상수
+│   ├── projects/
+│   │   ├── page.tsx             # 목록 (ISR 60초, Suspense 스켈레톤)
+│   │   └── [slug]/
+│   │       ├── page.tsx         # 상세 (generateStaticParams + ISR, generateMetadata)
+│   │       ├── error.tsx        # 페치 예외 안내 (유일한 클라이언트 페이지 컴포넌트)
+│   │       └── not-found.tsx    # 404
+│   ├── sitemap.ts               # 정적 + 발행 프로젝트 URL (1시간 재검증)
+│   └── robots.ts
 ├── components/
-│   ├── ui/                # shadcn/ui 컴포넌트
-│   ├── layout/            # Navbar, Footer, ThemeToggle
-│   └── providers/         # ThemeProvider
+│   ├── ui/                      # shadcn/ui
+│   ├── layout/                  # Navbar, Footer, ThemeToggle
+│   ├── providers/               # ThemeProvider
+│   └── projects/                # 카드·그리드·헤더·블록 렌더러·스켈레톤·빈/오류 상태
 ├── lib/
-│   ├── site-config.ts     # 사이트 이름·설명·네비게이션의 단일 출처
-│   └── utils.ts           # cn()
-├── docs/
-│   ├── PRD.md             # MVP 요구사항 정의
-│   └── prd-meta-prompt.md # PRD 생성에 사용한 메타 프롬프트
-└── public/
+│   ├── site-config.ts           # 사이트 이름·설명·siteUrl·네비게이션의 단일 출처
+│   ├── format-period.ts         # 기간 표기
+│   ├── utils.ts                 # cn()
+│   └── notion/
+│       ├── client.ts            # Notion Client 단일 인스턴스 (server-only, 재시도 3회)
+│       ├── queries.ts           # getPublishedProjects / getProjectBySlug / getProjectBlocks
+│       ├── mappers.ts           # Notion 응답 → Project / NotionBlock (타입 가드)
+│       ├── types.ts             # 앱 전용 타입
+│       ├── sort-projects.ts     # Order desc → Period Start desc
+│       ├── group-blocks.ts      # 연속 리스트 항목 묶기
+│       ├── file-host.ts         # Notion 파일 호스트 (next.config remotePatterns 와 공유)
+│       └── retry.ts             # safeFetch — 예외를 빈 값으로
+├── docs/PRD.md                  # MVP 요구사항
+├── tasks/                       # 작업별 명세·검증 기록
+└── ROADMAP.md                   # 개발 로드맵
 ```
 
 ### 콘텐츠의 단일 출처
@@ -88,9 +125,17 @@ Notion 쪽에서는 통합을 생성한 뒤, 대상 Database 페이지에 그 �
 npx shadcn@latest add [component-name]
 ```
 
-## 배포
+## 배포 (Vercel)
 
-Vercel을 기본 대상으로 가정합니다. ISR(`revalidate`) 동작 방식이 호스팅에 따라 달라지므로, 다른 플랫폼을 쓴다면 PRD §8의 렌더링 전략을 재검토해야 합니다.
+1. [vercel.com/new](https://vercel.com/new)에서 이 GitHub 저장소를 Import 합니다. 프레임워크는 Next.js로 자동 감지되고 빌드 설정은 기본값 그대로 둡니다.
+2. **Environment Variables**에 `NOTION_API_KEY`, `NOTION_PROJECTS_DATA_SOURCE_ID`를 등록합니다(Production·Preview 모두).
+3. Deploy. 빌드 로그에서 `/projects`·`/projects/[slug]`가 `Revalidate 1m`으로 표시되고 발행된 slug가 프리렌더되면 정상입니다.
+4. 배포 도메인이 정해지면 `lib/site-config.ts`의 `siteUrl`을 그 값으로 바꿉니다. `sitemap.xml`·`robots.txt`가 이 값을 씁니다.
+5. 배포 URL에서 Notion 제목을 수정하고 60초 뒤 새로고침 2회로 반영을 확인합니다(PRD S1~S3).
+
+### 호스팅을 바꾸는 경우
+
+ISR(`export const revalidate = 60`)과 `next/image` 최적화는 Node.js 서버 또는 그에 준하는 어댑터가 필요합니다. 정적 내보내기(`output: "export"`)나 이미지 최적화가 없는 플랫폼으로 옮긴다면 PRD §8의 렌더링 전략과 `next.config.ts`의 `images` 설정을 함께 재검토해야 합니다. 여러 인스턴스를 띄우는 자체 호스팅에서는 ISR 캐시가 인스턴스별로 나뉘므로 공유 캐시 핸들러가 필요합니다.
 
 ## 출처
 

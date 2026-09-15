@@ -18,7 +18,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
     <header className="space-y-6">
       {/* 헤더 커버는 첫 화면의 LCP 후보이므로 priority 로 프리로드한다. 본문 폭(max-w-3xl=48rem)이 상한 */}
       {coverUrl && (
-        <CoverImage src={coverUrl} alt={title} sizes="(max-width: 768px) 100vw, 48rem" priority />
+        <CoverImage src={coverUrl} alt={title} sizes="(max-width: 768px) 100vw, 48rem" eager />
       )}
       <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
       <p className="text-lg font-medium text-foreground">{outcome}</p>

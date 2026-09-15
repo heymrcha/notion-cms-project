@@ -17,7 +17,7 @@ export function ProjectGrid({ projects, className }: ProjectGridProps) {
     >
       {/* 첫 카드는 모든 폭에서 첫 화면에 들어오므로 그 커버만 LCP 후보로 프리로드한다 */}
       {projects.map((project, index) => (
-        <ProjectCard key={project.id} project={project} priority={index === 0} />
+        <ProjectCard key={project.id} project={project} eager={index === 0} />
       ))}
     </div>
   )

@@ -11,9 +11,12 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+// 모노 폰트는 본문 코드 블록에서만 쓰이는데 기본값으로 프리로드하면 모든 페이지에서 LCP 이미지와
+// 대역폭을 다툰다(Task 014 Lighthouse). 필요할 때 내려받도록 프리로드만 끈다
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {

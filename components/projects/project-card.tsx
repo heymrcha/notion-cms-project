@@ -15,10 +15,10 @@ import type { ProjectListItem } from "@/lib/notion/types"
 
 type ProjectCardProps = {
   project: ProjectListItem
-  priority?: boolean
+  eager?: boolean
 }
 
-export function ProjectCard({ project, priority = false }: ProjectCardProps) {
+export function ProjectCard({ project, eager = false }: ProjectCardProps) {
   const { slug, title, summary, outcome, periodStart, periodEnd, tags, coverUrl } = project
 
   return (
@@ -31,7 +31,7 @@ export function ProjectCard({ project, priority = false }: ProjectCardProps) {
             src={coverUrl}
             alt={title}
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            priority={priority}
+            eager={eager}
           />
         </div>
       )}
